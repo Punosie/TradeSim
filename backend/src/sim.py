@@ -1,6 +1,6 @@
 import json
 import os
-import deque
+from collections import deque
 from utils.orderbook_tools import get_best_bid_ask, simulate_market_buy
 from utils.latency_fee import apply_fee, simulate_latency
 
