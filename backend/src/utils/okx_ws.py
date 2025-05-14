@@ -5,7 +5,7 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-SAVE_PATH = "data_samples"
+SAVE_PATH = "../data_samples"
 SAMPLE_FILE = "btc_usdt_snap.json"
 os.makedirs(SAVE_PATH, exist_ok=True)
 URL = os.getenv("OKX_WS_URL")
@@ -28,7 +28,7 @@ async def collect_and_save_okx_data():
             ]
         }
         await ws.send(json.dumps(sub_msg))
-        print("Subscribed to BTC-USDT-SWAP orderbook...")
+        print("Subscribed to BTC-USDT-SWAP orde rbook...")
 
         samples = []
         while len(samples) < 10:
