@@ -18,6 +18,10 @@ def simulate_market_buy(orderbook, amount):
     filled = 0
     initial_price = asks[0][0] if asks else 0
 
+    for price, size, *_ in orderbook["data"][0]["asks"][:5]:
+        print(f"Ask Level: {price}, Size: {size}")
+    
+    used_levels = 0
     for price, size in asks:
         trade_value = price * size
         if cost + trade_value >= amount:
@@ -25,12 +29,16 @@ def simulate_market_buy(orderbook, amount):
             qty = remaining / price
             filled += qty
             cost += qty * price
+            used_levels += 1
             break
         else:
             filled += size
             cost += trade_value
+            used_levels += 1
 
     avg_price = cost / filled if filled > 0 else 0
     slippage = ((avg_price - initial_price) / initial_price) * 100 if initial_price else 0
+
+    print(f"[DEBUG] Used {used_levels} ask levels | Initial price: {initial_price} | Avg price: {avg_price:.2f} | Slippage: {slippage:.6f}%")
 
     return avg_price, slippage
