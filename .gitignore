@@ -1,0 +1,18 @@
+# Environment variable definitions
+*.env
+
+# Python virtual environment directory
+venv/
+
+# Python cache files
+__pycache__/
+
+# Log files
+*.log
+
+# Build artifacts
+dist/
+build/
+
+# Visual Studio Code settings
+.vscode/
