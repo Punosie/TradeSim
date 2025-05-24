@@ -14,9 +14,7 @@ async def sub_to_orderbook():
     async with websockets.connect(WS_URL) as websocket:
         async for message in websocket:
             data = json.loads(message)
-            json.dump(data, open(PATH, "w"), indent=4)
-            print("Received data")
-            break
+            yield data
 
-if __name__ == "__main__":
-    asyncio.run(sub_to_orderbook())
+# if __name__ == "__main__":
+#     asyncio.run(sub_to_orderbook())
