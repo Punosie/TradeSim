@@ -9,6 +9,7 @@ WS_URL = os.getenv("WS_ENDPOINT")
 PATH = "./dataSample/sample.json"
 os.makedirs(os.path.dirname(PATH), exist_ok=True)
 
+
 async def sub_to_orderbook():
     async with websockets.connect(WS_URL) as websocket:
         async for message in websocket:
