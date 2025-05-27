@@ -15,8 +15,8 @@ const Navbar = () => {
       <nav className="w-full max-w-full px-6 flex items-center justify-between">
         {/* Logo */}
         <Link to="/sim" className="flex items-center text-slate-100 font-bold text-lg md:text-2xl tracking-wider">
-          <FaBitcoinSign className="xl:text-4xl md:text-2xl text-lg " />
-          <span className="pl-4">
+          <FaBitcoinSign className="text-lg sm:text:xl lg:text-2xl xl:text-4xl" />
+          <span className=" pl-1 sm:pl-2">
             Trade<span className="text-pink-500">Sim</span>
           </span>
         </Link>
@@ -36,7 +36,7 @@ const Navbar = () => {
             onClick={() => setMenuOpen(!menuOpen)}
             className="text-pink-500 hover:text-pink-500 focus:outline-none"
           >
-            {menuOpen ? <HiX className="text-2xl" /> : <HiMenu className="text-2xl" />}
+            {menuOpen ? <HiX className="text-lg sm:text-xl" /> : <HiMenu className="text-lg sm:text-xl" />}
           </button>
         </div>
       </nav>
@@ -46,11 +46,11 @@ const Navbar = () => {
       {menuOpen && (
         <div className="md:hidden absolute top-10 left-0 w-full z-50 rounded-md backdrop-blur-md bg-gradient-to-b from-pink-950/40 to-slate-900/10 border-b border-pink-500/10 shadow-xl">
           <div className="flex flex-col items-end px-6 py-4 space-y-4">
-            <Link to="/" onClick={handleLinkClick} className="text-slate-200 text-base hover:text-pink-500 transition-transform hover:translate-x-1">Home</Link>
-            <Link to="/about" onClick={handleLinkClick} className="text-slate-200 text-base hover:text-pink-500 transition-transform hover:translate-x-1">About</Link>
-            <Link to="/sim" onClick={handleLinkClick} className="text-slate-200 text-base hover:text-pink-500 transition-transform hover:translate-x-1">Simulator</Link>
-            <Link to="/docs" onClick={handleLinkClick} className="text-slate-200 text-base hover:text-pink-500 transition-transform hover:translate-x-1">Docs</Link>
-            <Link to="/contact" onClick={handleLinkClick} className="text-slate-200 text-base hover:text-pink-500 transition-transform hover:translate-x-1">Contact</Link>
+            <Link to="/" onClick={handleLinkClick} className="text-slate-200 text-xs sm:text-sm hover:text-pink-500 transition-transform hover:translate-x-1">Home</Link>
+            <Link to="/about" onClick={handleLinkClick} className="text-slate-200 text-xs sm:text-sm hover:text-pink-500 transition-transform hover:translate-x-1">About</Link>
+            <Link to="/sim" onClick={handleLinkClick} className="text-slate-200 text-xs sm:text-sm hover:text-pink-500 transition-transform hover:translate-x-1">Simulator</Link>
+            <Link to="/docs" onClick={handleLinkClick} className="text-slate-200 text-xs sm:text-sm hover:text-pink-500 transition-transform hover:translate-x-1">Docs</Link>
+            <Link to="/contact" onClick={handleLinkClick} className="text-slate-200 text-xs sm:text-sm hover:text-pink-500 transition-transform hover:translate-x-1">Contact</Link>
           </div>
         </div>
       )}

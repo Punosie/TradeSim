@@ -19,8 +19,8 @@ const Home = () => {
                     </p>
                     <div className="flex flex-wrap justify-center gap-4">
                         <Link to="/sim" >
-                            <button className="rounded-lg px-6 py-3 font-medium border-2 border-pink-900 text-slate-300 hover:bg-pink-800 hover:text-slate-100 duration-350">
-                                Get started
+                            <button className="rounded-lg px-2 py-1 md:px-6 md:py-3 font-medium border-2 border-pink-900 text-slate-300 hover:bg-pink-800 hover:text-slate-100 duration-350">
+                                <span className="text-sm sm:text-md md:text-lg lg:text-xl">Get started</span>
                             </button>
                         </Link>
                     </div>

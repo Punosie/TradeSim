@@ -42,42 +42,42 @@ const TradeForm = ({ onSubmitResponse }) => {
     return (
         <>
             <form onSubmit={handleSubmit}>
-                <div className="flex flex-col gap-4">
-                    <label className="text-slate-200 text-sm md:text-md lg:text-lg">
+                <div className="flex flex-col gap-2 md:gap-4">
+                    <label className="text-slate-200 text-xs md:text-sm xl:text-lg">
                         <span className="font-bold">EXCHANGE</span>
                         <select
                             name="exchange"
                             value={formData.exchange}
                             onChange={(e) => setFormData({ ...formData, exchange: e.target.value })}
-                            className="w-full mt-2 p-2 bg-slate-800 text-slate-200 text-sm md:text-md lg:text-lg rounded-md">
+                            className="w-full m-1 md:mt-2 p-1 md:p-2 bg-slate-800 text-slate-200 text-xs md:text-sm xl:text-lg rounded-md">
                             <option value="OKX">OKX</option>
                         </select>
                     </label>
-                    <label className="text-slate-200 text-sm md:text-md lg:text-lg">
+                    <label className="text-slate-200 text-xs md:text-sm xl:text-lg">
                         <span className="font-bold">SPOT ASSET</span>
                         <select
                             name="asset"
                             value={formData.asset}
                             onChange={(e) => setFormData({ ...formData, asset: e.target.value })}
-                            className="w-full mt-2 p-2 bg-slate-800 text-slate-200 text-sm md:text-md lg:text-lg rounded-md">
+                            className="w-full m-1 md:mt-2 p-1 md:p-2 bg-slate-800 text-slate-200 text-xs md:text-sm xl:text-lg rounded-md">
                             <option value="BTC-USDT-SWAP">BTC-USDT-SWAP</option>
                         </select>
                     </label>
-                    <label className="text-slate-200 text-sm md:text-md lg:text-lg">
+                    <label className="text-slate-200 text-xs md:text-sm xl:text-lg">
                         <span className="font-bold">ORDER TYPE</span>
                         <select
                             name="order_type"
                             value={formData.order_type}
                             onChange={(e) => setFormData({ ...formData, order_type: e.target.value })}
-                            className="w-full mt-2 p-2 bg-slate-800 text-slate-200 text-sm md:text-md lg:text-lg rounded-md">
+                            className="w-full m-1 md:mt-2 p-1 md:p-2 bg-slate-800 text-slate-200 text-xs md:text-sm xl:text-lg rounded-md">
                             <option value="market">Market</option>
                         </select>
                     </label>
-                    <label className="text-slate-200 text-sm md:text-md lg:text-lg">
+                    <label className="text-slate-200 text-xs md:text-sm xl:text-lg">
                         <span className="font-bold">QUANTITY (USD)</span>
                         <input
                             type="number"
-                            className="w-full mt-2 p-2 bg-slate-800 text-slate-200 text-sm md:text-md lg:text-lg rounded-md"
+                            className="w-full m-1 md:mt-2 p-1.5 md:p-2 bg-slate-800 text-slate-200 text-xs md:text-sm xl:text-lg rounded-md"
                             value={formData.qty_usd}
                             onChange={(e) => setFormData({ ...formData, qty_usd: e.target.value })}
                             placeholder="Enter quantity in USD"
@@ -89,7 +89,7 @@ const TradeForm = ({ onSubmitResponse }) => {
                 </div>
                 <button
                     type="submit"
-                    className={`mt-6 w-full p-2 border text-md rounded-md transition duration-300 ${!formData.qty_usd || formData.qty_usd <= 0
+                    className={`m-2 md:mt-6 w-full p-1.5 md:p-2 border text-xs sm:text-sm md:text-md xl:text-lg rounded-md transition duration-300 ${!formData.qty_usd || formData.qty_usd <= 0
                         ? 'border-slate-500 text-slate-400 cursor-not-allowed'
                         : 'border-emerald-500 text-white hover:bg-emerald-600'
                         }`}

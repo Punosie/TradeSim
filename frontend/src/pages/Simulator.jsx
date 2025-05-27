@@ -2,6 +2,7 @@ import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import TradeForm from "../components/TradeForm";
 import TradeOutput from "../components/TradeOutput";
+import OrderBook from "../components/OrderBook";
 import { useState } from 'react';
 
 const Simulator = () => {
@@ -31,23 +32,26 @@ const Simulator = () => {
                 <Navbar />
             </div>
             <div className="flex-grow">
-                <div className="relative flex h-full flex-col px-4 space-y-40">
-                    <div className="max-w-full text-center">
-                        <h1 className="mb-8 font-bold tracking-wide sm:text-xl lg:text-3xl text-slate-200">
+                <div className="relative flex h-full flex-col px-4">
+                    <div className=" flex flex-col items-center justify-center mb-5 md:mb-15">
+                        <h1 className="font-bold tracking-wide text-lg sm:text-xl lg:text-2xl text-slate-200 mb-2">
                             ORDERBOOK
                         </h1>
+                        <div className="w-full max-w-4xl h-[200px] md:h-[350px] rounded-md p-2  ">
+                            <OrderBook />
+                        </div>
                     </div>
-                    <div className="flex flex-wrap h-full gap-8 justify-around " >
+                    <div className="flex flex-wrap h-full gap:2 md:gap-8 justify-around " >
                         <div className="flex-1 min-w-[315px] max-w-[450px] border rounded-md p-4 border-transparent" >
-                            <span className=" text-slate-100 text-shadow-sm text-md md:text-lg xl:text-2xl text-center mb-4 p-2 block tracking-wide font-bold">TRADE CONFIGURATION</span>
+                            <span className=" text-slate-100 text-shadow-sm text-sm md:text-md xl:text-xl text-center mb-4 p-2 block tracking-wide font-bold">TRADE CONFIGURATION</span>
                             <TradeForm onSubmitResponse={setResponse} />
                         </div>
                         <div className="flex-1 min-w-[315px] max-w-[450px] border rounded-md p-4 border-transparent" >
-                            <span className="text-slate-100 text-md md:text-xl xl:text-2xl text-center mb-4 p-2 block tracking-wide font-bold">PREDICTION METRICS</span>
+                            <span className="text-slate-100 text-sm md:text-md xl:text-xl text-center mb-4 p-2 block tracking-wide font-bold">PREDICTION METRICS</span>
                             <TradeForm onSubmitResponse={setResponse} />
                         </div>
                         <div className="flex-1 min-w-[315px] max-w-[450px] border rounded-md p-4 border-transparent" >
-                            <span className="text-slate-100 text-md md:text-xl xl:text-2xl text-center mb-4 p-2 block tracking-wide font-bold">TRADE OUTPUT</span>
+                            <span className="text-slate-100 text-sm md:text-md xl:text-xl text-center mb-4 p-2 block tracking-wide font-bold">TRADE OUTPUT</span>
                             <TradeOutput result={response} />
                         </div>
                     </div>

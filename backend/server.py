@@ -3,7 +3,7 @@ import uvicorn
 import orjson
 from schemas import Trade_input
 from dotenv import load_dotenv
-from fastapi import FastAPI, WebSocket, HTTPException
+from fastapi import FastAPI, WebSocket, HTTPException, WebSocketDisconnect
 from okx_ws import sub_to_orderbook
 import asyncio
 import time
@@ -153,10 +153,16 @@ async def home():
 # ws://127.0.0.1:8000/ws/okx
 async def orderbook_ws(websockt: WebSocket):
     await websockt.accept()
-    await websockt.send_text("WebSocket connection established. Subscribing to orderbook...")
-
-    async for message in sub_to_orderbook():
-        await websockt.send_json(message)
+    print("WebSocket connection established")
+    try:
+        async for message in sub_to_orderbook():
+            await websockt.send_json(message)
+    except Exception as e:
+        print(f"WebSocket error: {e}")
+    except WebSocketDisconnect:
+        print("WebSocket connection closed")
+    finally:
+        print("WebSocket connection closed")
 
 
 @app.post("/simulate/trade")

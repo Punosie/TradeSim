@@ -1,1 +1,28 @@
 @import "tailwindcss";
+
+.ag-header-cell.text-center {
+  .ag-header-cell-label {
+    justify-content: center;
+  }
+}
+
+.ag-header-cell.wrap-header .ag-header-cell-label {
+  white-space: normal !important; /* allow text wrap */
+  line-height: 1.2;
+  text-align: center;
+  justify-content: center;
+  display: flex; /* required for justify-content */
+  align-items: center; /* vertical centering */
+  height: 100%;
+  padding: 4px; /* allow breathing room for wrapping */
+}
+
+.ag-theme-material .ag-root {
+  border-radius: 0.75rem; /* rounded-xl equivalent */
+  overflow: hidden;
+}
+
+.ag-theme-material .ag-root-wrapper {
+  border-radius: 0.75rem !important;
+  overflow: hidden;
+}

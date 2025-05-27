@@ -16,12 +16,12 @@ const TradeOutput = ({ result }) => {
             ) : (
                 <>
                     <h2
-                        className={`text-center text-md md:text-xl ${result.status === 'success' ? 'text-emerald-400' : 'text-rose-400'
+                        className={`text-center text-xs md:text-sm xl:text-lg ${result.status === 'success' ? 'text-emerald-400' : 'text-rose-400'
                             } font-semibold mb-4`}
                     >
                         {result.status === 'success' ? 'Trade Successful' : 'Trade Failed'}
                     </h2>
-                    <div className="grid gap-y-2 text-sm md:text-lg">
+                    <div className="grid gap-y-2 text-xs md:text-sm xl:text-lg">
                         {[
                             "exchange",
                             "asset",
