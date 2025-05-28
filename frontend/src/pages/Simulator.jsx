@@ -3,6 +3,7 @@ import Navbar from "../components/Navbar";
 import TradeForm from "../components/TradeForm";
 import TradeOutput from "../components/TradeOutput";
 import OrderBook from "../components/OrderBook";
+import Prediction from "../components/Prediction";
 import { useState } from 'react';
 
 const Simulator = () => {
@@ -48,7 +49,7 @@ const Simulator = () => {
                         </div>
                         <div className="flex-1 min-w-[315px] max-w-[450px] border rounded-md p-4 border-transparent" >
                             <span className="text-slate-100 text-sm md:text-md xl:text-xl text-center mb-4 p-2 block tracking-wide font-bold">PREDICTION METRICS</span>
-                            <TradeForm onSubmitResponse={setResponse} />
+                            <Prediction />
                         </div>
                         <div className="flex-1 min-w-[315px] max-w-[450px] border rounded-md p-4 border-transparent" >
                             <span className="text-slate-100 text-sm md:text-md xl:text-xl text-center mb-4 p-2 block tracking-wide font-bold">TRADE OUTPUT</span>

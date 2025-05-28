@@ -45,23 +45,23 @@ const OrderBook = () => {
     return (
         <>
             <div className="h-full w-full flex gap-2 md:gap-5">
-                {/* Asks */}
+                {/* Bids */}
                 <div className="h-full w-full ag-theme-material text-center ">
-                    <span className="text-xs sm:text-md md:text-xl font-bold text-emerald-600 ">ASKS</span>
+                    <span className="text-xs sm:text-md md:text-xl font-bold text-emerald-600">BIDS</span>
                     <AgGridReact
-                        theme={themes.askTheme}
-                        rowData={asks}
+                        theme={themes.bidTheme}
+                        rowData={bids}
                         columnDefs={columnDefs}
                         suppressMovableColumns={true}
                         suppressDragLeaveHidesColumns={true}
                     />
                 </div>
-                {/* Bids */}
+                {/* Asks */}
                 <div className="h-full w-full ag-theme-material text-center ">
-                    <span className="text-xs sm:text-md md:text-xl font-bold text-rose-600">BIDS</span>
+                    <span className="text-xs sm:text-md md:text-xl font-bold text-rose-600 ">ASKS</span>
                     <AgGridReact
-                        theme={themes.bidTheme}
-                        rowData={bids}
+                        theme={themes.askTheme}
+                        rowData={asks}
                         columnDefs={columnDefs}
                         suppressMovableColumns={true}
                         suppressDragLeaveHidesColumns={true}

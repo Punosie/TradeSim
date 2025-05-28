@@ -919,4 +919,5 @@
     "total_spent": 9999.0,
     "latency": "0.31ms",
     "status": "success"
-}
+}{"timestamp":"2025-05-28T19:39:07Z","exchange":"OKX","asset":"BTC-USDT-SWAP","order_type":"market","qty_usd":1005500.0,"filled_qty":9.36910695,"fee_usd":452.475,"slippage":0.0,"average_price":107272.5,"total_spent":1005500.0,"latency":"0.21ms","status":"success"}
+{"timestamp":"2025-05-28T20:09:16Z","exchange":"OKX","asset":"BTC-USDT-SWAP","order_type":"market","qty_usd":1000.0,"filled_qty":0.0093406,"fee_usd":1.0,"slippage":0.0,"average_price":106952.4,"total_spent":1000.0,"latency":"0.19ms","status":"success"}

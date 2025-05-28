@@ -2,7 +2,7 @@ import asyncio
 from fastapi import FastAPI
 from dotenv import load_dotenv
 from contextlib import asynccontextmanager
-from app.routes import root, websocket, trade
+from app.routes import root, websocket, trade, prediction_ws
 from app.services.orderbook import orderbook_updater
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -33,3 +33,4 @@ app.add_middleware(
 app.include_router(root.router)
 app.include_router(websocket.router)
 app.include_router(trade.router)
+app.include_router(prediction_ws.router)

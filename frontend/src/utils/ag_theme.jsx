@@ -7,7 +7,7 @@ const glassStyle = {
     borderRadius: '0.75rem',
 };
 
-const askTheme = themeBalham
+const bidTheme = themeBalham
     .withPart(colorSchemeDark)
     .withParams({
         ...glassStyle,
@@ -16,7 +16,7 @@ const askTheme = themeBalham
         fontFamily: 'inherit',
     });
 
-const bidTheme = themeBalham
+const askTheme = themeBalham
     .withPart(colorSchemeDark)
     .withParams({
         ...glassStyle,
