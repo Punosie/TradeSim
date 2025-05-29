@@ -2,24 +2,24 @@ import { FaGithub, FaInstagram, FaLinkedin, FaXTwitter, FaHeart } from "react-ic
 
 const Footer = () => {
   return (
-    <footer className="w-screen px-4 pt-2 border-t-1 border-slate-800 text-slate-100 text-sm md:text-lg lg:text-xl bg-transparent flex flex-col items-center justify-center gap-4">
+    <footer className="w-full mt-auto px-6 py-4 border-t border-slate-700 text-slate-100 text-sm md:text-md lg:text-lg bg-transparent flex flex-col items-center justify-center gap-4">
       <div className="flex items-center gap-2">
         <span>Made with</span>
-        <FaHeart className="text-red-500" />
-        <span>by Shubhankar Kaushik</span>
+        <FaHeart className="text-red-500 animate-pulse" />
+        <span>by <span className="font-semibold text-rose-400">Shubhankar Kaushik</span></span>
       </div>
 
-      <div className="flex items-center gap-8 text-md md:text-lg lg:text-xl ">
-        <a href="https://github.com/Punosie" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+      <div className="flex items-center gap-6 text-xl">
+        <a href="https://github.com/Punosie" target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="hover:text-emerald-400 transition">
           <FaGithub />
         </a>
-        <a href="https://www.linkedin.com/in/shubhankar-kaushik/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+        <a href="https://www.linkedin.com/in/shubhankar-kaushik/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="hover:text-sky-400 transition">
           <FaLinkedin />
         </a>
-        <a href="https://x.com/pun0sie" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)">
+        <a href="https://x.com/pun0sie" target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)" className="hover:text-blue-400 transition">
           <FaXTwitter />
         </a>
-        <a href="https://www.instagram.com/shubhankar.2003/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+        <a href="https://www.instagram.com/shubhankar.2003/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="hover:text-pink-400 transition">
           <FaInstagram />
         </a>
       </div>

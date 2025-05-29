@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "tailwindcss-animated";
 
 .ag-header-cell.text-center {
   .ag-header-cell-label {

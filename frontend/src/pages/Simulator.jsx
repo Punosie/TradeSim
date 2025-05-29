@@ -34,7 +34,7 @@ const Simulator = () => {
             </div>
             <div className="flex-grow">
                 <div className="relative flex h-full flex-col px-4">
-                    <div className=" flex flex-col items-center justify-center mb-5 md:mb-15">
+                    <div className=" animate-fade-down animate-duration-[1500ms] animate-delay-150 animate-ease-out flex flex-col items-center justify-center mb-5 md:mb-15">
                         <h1 className="font-bold tracking-wide text-lg sm:text-xl lg:text-2xl text-slate-200 mb-2">
                             ORDERBOOK
                         </h1>
@@ -42,7 +42,7 @@ const Simulator = () => {
                             <OrderBook />
                         </div>
                     </div>
-                    <div className="flex flex-wrap h-full gap:2 md:gap-8 justify-around " >
+                    <div className="animate-fade-up animate-duration-[1000ms] animate-delay-150 animate-ease-out flex flex-wrap h-full gap:2 md:gap-8 justify-around " >
                         <div className="flex-1 min-w-[315px] max-w-[450px] border rounded-md p-4 border-transparent" >
                             <span className=" text-slate-100 text-shadow-sm text-sm md:text-md xl:text-xl text-center mb-4 p-2 block tracking-wide font-bold">TRADE CONFIGURATION</span>
                             <TradeForm onSubmitResponse={setResponse} />
