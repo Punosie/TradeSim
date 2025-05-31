@@ -1,0 +1,54 @@
+Light Mode
+:root {
+  --ifm-background-color: #e2e8f0; /* slate-200 */
+  --ifm-background-color-darker: #cbd5e1; /* slate-300 */
+  --ifm-font-color-base: #000000; /* black */
+  --ifm-color-primary: #ec4899; /* pink-500 */
+  --ifm-color-primary-dark: #db2777;
+  --ifm-color-primary-darker: #be185d;
+  --ifm-color-primary-darkest: #9d174d;
+  --ifm-color-primary-light: #f472b6;
+  --ifm-color-primary-lighter: #f9a8d4;
+  --ifm-color-primary-lightest: #fce7f3;
+
+  --ifm-navbar-background-color: #cbd5e1;
+  --ifm-footer-background-color: #cbd5e1;
+  --ifm-code-font-size: 95%;
+  --docusaurus-highlighted-code-line-bg: rgba(236, 72, 153, 0.1);
+}
+
+/* Dark Mode */
+[data-theme='dark'] {
+  --ifm-background-color: #500724; /* pink-950 */
+  --ifm-font-color-base: #e2e8f0; /* slate-200 */
+  --ifm-color-primary: #ec4899;
+  --ifm-color-primary-dark: #db2777;
+  --ifm-color-primary-darker: #be185d;
+  --ifm-color-primary-darkest: #9d174d;
+  --ifm-color-primary-light: #f472b6;
+  --ifm-color-primary-lighter: #f9a8d4;
+  --ifm-color-primary-lightest: #fce7f3;
+
+  --ifm-navbar-background-color: #171717;
+  --ifm-footer-background-color: #171717;
+    --docusaurus-highlighted-code-line-bg: rgba(236, 72, 153, 0.3);
+}
+
+/* Global text/link/button styles */
+a {
+  color: var(--ifm-color-primary);
+}
+
+a:hover {
+  color: var(--ifm-color-primary-darkest);
+}
+
+.button--primary {
+  background-color: var(--ifm-color-primary);
+  border-color: var(--ifm-color-primary-dark);
+  color: white;
+}
+
+.button--primary:hover {
+  background-color: var(--ifm-color-primary-dark);
+}

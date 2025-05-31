@@ -26,7 +26,15 @@ const Navbar = () => {
           <Link to="/" className="text-slate-300 hover:text-pink-500 transition-transform hover:scale-105">Home</Link>
           <Link to="/sim" className="text-slate-300 hover:text-pink-500 transition-transform hover:scale-105">Simulator</Link>
           <Link to="/about" className="text-slate-300 hover:text-pink-500 transition-transform hover:scale-105">About</Link>
-          <Link to="/docs" className="text-slate-300 hover:text-pink-500 transition-transform hover:scale-105">Docs</Link>
+          <a
+            href="https://punosie.github.io/TradeSim/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-slate-300 hover:text-pink-500 transition-transform hover:scale-105"
+          >
+            Docs
+          </a>
+
           <Link to="/contact" className="text-slate-300 hover:text-pink-500 transition-transform hover:scale-105">Contact</Link>
         </div>
 
@@ -55,7 +63,16 @@ const Navbar = () => {
           <Link to="/" onClick={handleLinkClick} className="text-slate-200 text-xs sm:text-sm hover:text-pink-500 transition-transform hover:translate-x-1">Home</Link>
           <Link to="/sim" onClick={handleLinkClick} className="text-slate-200 text-xs sm:text-sm hover:text-pink-500 transition-transform hover:translate-x-1">Simulator</Link>
           <Link to="/about" onClick={handleLinkClick} className="text-slate-200 text-xs sm:text-sm hover:text-pink-500 transition-transform hover:translate-x-1">About</Link>
-          <Link to="/docs" onClick={handleLinkClick} className="text-slate-200 text-xs sm:text-sm hover:text-pink-500 transition-transform hover:translate-x-1">Docs</Link>
+          <a
+            href="https://punosie.github.io/TradeSim/"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={handleLinkClick}
+            className="text-slate-200 text-xs sm:text-sm hover:text-pink-500 transition-transform hover:translate-x-1"
+          >
+            Docs
+          </a>
+
           <Link to="/contact" onClick={handleLinkClick} className="text-slate-200 text-xs sm:text-sm hover:text-pink-500 transition-transform hover:translate-x-1">Contact</Link>
         </div>
       </div>

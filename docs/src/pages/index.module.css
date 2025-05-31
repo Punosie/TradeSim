@@ -1,0 +1,66 @@
+.heroBanner {
+  padding: 6rem 1rem 4rem;
+  text-align: center;
+  background-color: var(--ifm-background-color);
+  color: var(--ifm-font-color-base);
+  position: relative;
+  overflow: hidden;
+}
+
+@media screen and (max-width: 996px) {
+  .heroBanner {
+    padding: 3rem 1rem 2rem;
+  }
+}
+
+.buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.features {
+  padding: 5rem 1rem;
+  background-color: var(--ifm-background-color);
+}
+
+.featureCard {
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+  padding: 2rem 1.5rem;
+  margin: 1rem 0;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+}
+
+[data-theme='dark'] .featureCard {
+  background: #1f2937; /* Tailwind slate-800 */
+}
+
+.featureCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+.featureTitle {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--ifm-color-primary);
+  margin-bottom: 0.5rem;
+}
+
+.featureDescription {
+  font-size: 1rem;
+  color: #4a5568;
+  line-height: 1.6;
+}
+
+[data-theme='dark'] .featureDescription {
+  color: #e2e8f0;
+}
