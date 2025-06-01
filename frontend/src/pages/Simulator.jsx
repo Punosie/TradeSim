@@ -34,7 +34,7 @@ const Simulator = () => {
             </div>
             <div className="flex-grow">
                 <div className="relative flex h-full flex-col px-4">
-                    <div className=" animate-fade-down animate-duration-[1500ms] animate-delay-150 animate-ease-out flex flex-col items-center justify-center mb-5 md:mb-15">
+                    <div className=" animate-fade-down animate-duration-[1200ms] animate-delay-150 animate-ease-out flex flex-col items-center justify-center mb-5 md:mb-15">
                         <h1 className="font-bold tracking-wide text-lg sm:text-xl lg:text-2xl text-slate-200 mb-2">
                             ORDERBOOK
                         </h1>

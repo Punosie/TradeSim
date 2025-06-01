@@ -1,17 +1,33 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FaBitcoinSign } from "react-icons/fa6";
 import { HiMenu, HiX } from "react-icons/hi";
+import useAuth from "../hooks/useAuthHook";
+import { Avatar } from "./Avatar";
+import LoginDialog from "./LoginDialog";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [loginDialogOpen, setLoginDialogOpen] = useState(false);
+  const { user } = useAuth();
+  const loginRef = useRef();
 
-  const handleLinkClick = () => {
-    setMenuOpen(false);
-  };
+  const handleLinkClick = () => setMenuOpen(false);
+
+  // 👇 Close login dialog when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (loginRef.current && !loginRef.current.contains(e.target)) {
+        setLoginDialogOpen(false);
+      }
+    };
+    if (loginDialogOpen) document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [loginDialogOpen]);
+
 
   return (
-    <header className="w-full pt-2 border-b border-slate-800 text-slate-100 bg-transparent">
+    <header className="w-full pt-2 border-b border-slate-800 text-slate-100 bg-transparent relative">
       <nav className="w-full max-w-full px-6 flex items-center justify-between">
         {/* Logo */}
         <Link to="/sim" className="flex items-center text-slate-100 font-bold text-lg md:text-2xl tracking-wider">
@@ -34,8 +50,33 @@ const Navbar = () => {
           >
             Docs
           </a>
-
           <Link to="/contact" className="text-slate-300 hover:text-pink-500 transition-transform hover:scale-105">Contact</Link>
+        </div>
+
+        {/* Avatar + LoginDialog */}
+        <div className="relative hidden md:flex items-center">
+          {user ? (
+            <button onClick={() => setLoginDialogOpen((prev) => !prev)}>
+              <Avatar
+                src={user.photoURL}
+                alt={user.displayName}
+                size={40}
+                className="rounded-full border-2 border-pink-500 hover:scale-105 transition-transform duration-300"
+              />
+            </button>
+          ) : (
+            <button
+              onClick={() => setLoginDialogOpen((prev) => !prev)}
+              className="rounded-lg border-2 border-pink-500 px-4 py-2 text-slate-300 hover:bg-pink-700 hover:text-white duration-300"
+            >
+              Login
+            </button>
+          )}
+          {loginDialogOpen && (
+            <div className="absolute top-14 right-0 z-50">
+              <LoginDialog closeDialog={() => setLoginDialogOpen(false)} />
+            </div>
+          )}
         </div>
 
         {/* Mobile Menu Toggle */}
@@ -50,7 +91,7 @@ const Navbar = () => {
         </div>
       </nav>
 
-      {/* Mobile Menu - always rendered */}
+      {/* Mobile Menu */}
       <div
         className={`
           md:hidden absolute top-10 left-0 w-full z-50 rounded-md backdrop-blur-md
@@ -72,7 +113,6 @@ const Navbar = () => {
           >
             Docs
           </a>
-
           <Link to="/contact" onClick={handleLinkClick} className="text-slate-200 text-xs sm:text-sm hover:text-pink-500 transition-transform hover:translate-x-1">Contact</Link>
         </div>
       </div>

@@ -1,6 +1,28 @@
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom';
+import { signInWithGoogle, signInWithGithub } from '../utils/auth'
 
 const Home = () => {
+
+    const navigate = useNavigate();
+
+    const handleGoogleSignIn = async () => {
+        try {
+            await signInWithGoogle();
+            navigate("/sim");
+        } catch (error) {
+            console.error("Google sign-in failed:", error);
+        }
+    };
+
+    const handleGithubSignIn = async () => {
+        try {
+            await signInWithGithub();
+            navigate("/sim");
+        } catch (error) {
+            console.error("GitHub sign-in failed:", error);
+        }
+    };
+
     return (
         <div className="relative h-screen">
             <div className="absolute inset-0">
@@ -19,12 +41,20 @@ const Home = () => {
                         Simulate your crypto trades with precision. Analyze slippage, fees, and market impact before you execute — built for traders, quants, and analysts.
                     </p>
 
-                    <div className="flex flex-wrap justify-center gap-4 animate-fade-up animate-duration-[1500ms] animate-delay-750 animate-ease-out">
-                        <Link to="/sim">
-                            <button className="rounded-lg px-2 py-1 md:px-6 md:py-3 font-medium border-2 border-pink-900 text-slate-300 hover:bg-pink-800 hover:text-slate-100 duration-350">
-                                <span className="text-sm sm:text-md md:text-lg lg:text-xl">Get started</span>
-                            </button>
-                        </Link>
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                        <button
+                            onClick={handleGoogleSignIn}
+                            className="rounded-lg px-2 py-1 md:px-6 md:py-3 font-medium border-2 border-pink-700 text-slate-300 hover:bg-pink-800 hover:text-white duration-300"
+                        >
+                            <span className="text-sm sm:text-md md:text-lg lg:text-xl">Sign in with Google</span>
+                        </button>
+
+                        <button
+                            onClick={handleGithubSignIn}
+                            className="rounded-lg px-2 py-1 md:px-6 md:py-3 font-medium border-2 border-sky-700 text-slate-300 hover:bg-sky-800 hover:text-white duration-300"
+                        >
+                            <span className="text-sm sm:text-md md:text-lg lg:text-xl">Sign in with GitHub</span>
+                        </button>
                     </div>
 
                 </div>
