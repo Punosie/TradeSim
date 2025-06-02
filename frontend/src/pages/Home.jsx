@@ -1,35 +1,66 @@
 import { useNavigate } from 'react-router-dom';
-import { signInWithGoogle, signInWithGithub } from '../utils/auth'
+import { useState } from 'react';
+import { signInWithGoogle, signInWithGithub } from '../utils/auth';
+import Navbar from '../components/Navbar';
 
 const Home = () => {
-
     const navigate = useNavigate();
+    const [isSigningIn, setIsSigningIn] = useState(false);
 
     const handleGoogleSignIn = async () => {
+        if (isSigningIn) return;
+        setIsSigningIn(true);
+        setTimeout(() => setIsSigningIn(false), 1000);
         try {
             await signInWithGoogle();
             navigate("/sim");
         } catch (error) {
-            console.error("Google sign-in failed:", error);
+            if (
+                error.code === 'auth/popup-closed-by-user' ||
+                error.code === 'auth/cancelled-popup-request'
+            ) {
+                setIsSigningIn(false);
+                return;
+            } else {
+                console.error("Google sign-in failed:", error);
+            }
+        } finally {
+            setIsSigningIn(false);
         }
     };
 
     const handleGithubSignIn = async () => {
+        if (isSigningIn) return;
+        setIsSigningIn(true);
         try {
             await signInWithGithub();
             navigate("/sim");
         } catch (error) {
-            console.error("GitHub sign-in failed:", error);
+            if (error.code === 'auth/popup-closed-by-user') {
+                setIsSigningIn(false);
+                return;
+            } else {
+                console.error("GitHub sign-in failed:", error);
+            }
+        } finally {
+            setIsSigningIn(false);
         }
     };
 
     return (
-        <div className="relative h-screen">
-            <div className="absolute inset-0">
-                <div className="absolute inset-0 -z-10 h-full w-full items-center px-5 py-24 [background:radial-gradient(125%_125%_at_50%_10%,#000_50%,#d07_120%)]"></div>
+        <div className="relative min-h-screen flex flex-col">
+            <title>TradeSim</title>
+
+            {/* Background */}
+            <div className="absolute inset-0 -z-10 [background:radial-gradient(125%_125%_at_50%_10%,#000_50%,#d07_120%)]"></div>
+
+            {/* Navbar */}
+            <div className="z-10">
+                <Navbar />
             </div>
 
-            <div className="relative z-10 flex h-full flex-col items-center justify-center px-4">
+            {/* Main content fills remaining space */}
+            <div className="flex-grow flex items-center justify-center px-4">
                 <div className="max-w-3xl text-center">
                     <h1 className="mb-8 text-4xl font-bold tracking-tight sm:text-6xl lg:text-7xl text-white flex justify-center gap-2">
                         <span className="text-emerald-400 animate-fade-up animate-duration-[1500ms] animate-delay-150 animate-ease-out">Predict.</span>
@@ -56,11 +87,10 @@ const Home = () => {
                             <span className="text-sm sm:text-md md:text-lg lg:text-xl">Sign in with GitHub</span>
                         </button>
                     </div>
-
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default Home
+export default Home;
