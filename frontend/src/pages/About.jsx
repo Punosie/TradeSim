@@ -4,6 +4,7 @@ import Footer from '../components/Footer';
 const About = () => {
   return (
     <div className="relative min-h-screen flex flex-col">
+      <title>About | TradeSim</title>
       {/* Background */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 -z-10 h-full w-full px-5 py-24 [background:radial-gradient(125%_125%_at_50%_10%,#000_50%,#d07_120%)]"></div>
@@ -35,6 +36,7 @@ const About = () => {
           </p>
         </div>
         {/* TechStack */}
+        {/* TechStack */}
         <hr className="border-t border-pink-600 my-12 w-full mx-auto opacity-50" />
         <div className="mt-10 text-slate-100">
           <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center text-pink-500">
@@ -42,28 +44,29 @@ const About = () => {
           </h2>
           <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 text-center text-sm sm:text-md md:text-lg text-slate-300">
             {[
-              { name: 'Python', color: 'hover:bg-yellow-500' },
-              { name: 'FastAPI', color: 'hover:bg-emerald-500' },
-              { name: 'React.js', color: 'hover:bg-blue-500' },
-              { name: 'Vite', color: 'hover:bg-purple-500' },
-              { name: 'Tailwind CSS', color: 'hover:bg-cyan-500' },
-              { name: 'AGgrid', color: 'hover:bg-pink-500' },
-              { name: 'Postman', color: 'hover:bg-orange-500' },
-              { name: 'WebSockets', color: 'hover:bg-teal-500' },
+              { name: 'Python', shadow: 'hover:shadow-yellow-400/30' },
+              { name: 'FastAPI', shadow: 'hover:shadow-emerald-400/30' },
+              { name: 'React.js', shadow: 'hover:shadow-blue-400/30' },
+              { name: 'Vite', shadow: 'hover:shadow-purple-400/30' },
+              { name: 'Tailwind CSS', shadow: 'hover:shadow-cyan-400/30' },
+              { name: 'AG Grid', shadow: 'hover:shadow-pink-400/30' },
+              { name: 'Postman', shadow: 'hover:shadow-orange-400/30' },
+              { name: 'WebSockets', shadow: 'hover:shadow-teal-400/30' },
             ].map((tech, idx) => (
               <li
                 key={idx}
                 style={{ animationDelay: `${250 + idx * 50}ms` }}
-                className={`animate-fade-up animate-once animate-duration-[1500ms] animate-ease-out bg-gradient-to-b from-pink-950/40 to-slate-900/10 backdrop-blur-md border border-pink-500/10 p-3 rounded-lg shadow-xl transition duration-300 transform hover:scale-105 ${tech.color} hover:bg-opacity-50`}
+                className={`animate-fade-up animate-once animate-duration-[1500ms] animate-ease-out
+          bg-gradient-to-b from-pink-950/40 to-slate-900/10
+          backdrop-blur-md border border-pink-500/10
+          p-4 rounded-xl shadow-lg transition duration-300
+          transform hover:scale-105 hover:bg-pink-950/60 ${tech.shadow}`}
               >
                 {tech.name}
               </li>
             ))}
           </ul>
-
-
         </div>
-
 
       </div>
 
