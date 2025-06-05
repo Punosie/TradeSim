@@ -2,8 +2,8 @@ import asyncio
 from fastapi import FastAPI
 from dotenv import load_dotenv
 from contextlib import asynccontextmanager
-from app.routes import root, websocket, trade, prediction_ws
-from app.services.orderbook import orderbook_updater
+from app.router.routes import router as app_router
+from app.services.orderbook_manager import shared_orderbook
 from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv()
@@ -11,7 +11,7 @@ load_dotenv()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # This runs on startup
-    task = asyncio.create_task(orderbook_updater())
+    task = asyncio.create_task(shared_orderbook.update())
     yield
     # This runs on shutdown (cancel background task)
     task.cancel()
@@ -30,7 +30,4 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(root.router)
-app.include_router(websocket.router)
-app.include_router(trade.router)
-app.include_router(prediction_ws.router)
+app.include_router(app_router)

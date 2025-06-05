@@ -1,5 +1,4 @@
 import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
 import FeedbackForm from '../components/FeedbackForm';
 import {
     FaGithubAlt,
@@ -11,6 +10,7 @@ import {
 const Contact = () => {
     return (
         <div className="relative min-h-screen flex flex-col">
+            <title>Contact | TradeSim</title>
             {/* Background */}
             <div className="absolute inset-0">
                 <div className="absolute inset-0 -z-10 h-full w-full px-5 py-24 [background:radial-gradient(125%_125%_at_50%_10%,#000_50%,#d07_120%)]"></div>
@@ -28,11 +28,11 @@ const Contact = () => {
                 </h1>
 
                 <div className="mt-10 text-slate-300 text-center space-y-4 text-md md:text-lg">
-                        <p className='animate-fade-right sm:animate-fade-up animate-duration-[1500] animate-delay-250'>Have a question, suggestion, or just want to say hello?</p>
-                        <p className='animate-fade-right sm:animate-fade-up animate-duration-[1500] animate-delay-350'>
-                            Feel free to reach out through any of the methods below. I’ll get
-                            back to you as soon as possible!
-                        </p>
+                    <p className='animate-fade-right sm:animate-fade-up animate-duration-[1500] animate-delay-250'>Have a question, suggestion, or just want to say hello?</p>
+                    <p className='animate-fade-right sm:animate-fade-up animate-duration-[1500] animate-delay-350'>
+                        Feel free to reach out through any of the methods below. I’ll get
+                        back to you as soon as possible!
+                    </p>
                 </div>
 
                 {/* Contact Info Cards */}

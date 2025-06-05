@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field
 from typing import Literal
 
 
-class Trade_input(BaseModel):
+class TradeInput(BaseModel):
     """
     Schema for trade input data.
     """

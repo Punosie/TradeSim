@@ -10,6 +10,7 @@ const Simulator = () => {
     const [response, setResponse] = useState(null)
     return (
         <div className="relative min-h-screen overflow-clip flex flex-col justify-between">
+            <title>Simulator | TradeSim</title>
             {/* Background gradients */}
             <div className="absolute inset-0 bg-gray-950">
                 {/* Right-side blob */}

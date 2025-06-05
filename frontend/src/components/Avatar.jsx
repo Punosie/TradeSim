@@ -1,6 +1,6 @@
-// Description: Avatar component with a radial mask effect
+import defaultAvatar from '../assets/avatar.jpg';
 
-export const Avatar = ({src, alt, size = 50, className = ""}) => {
+export const Avatar = ({src = defaultAvatar, alt = "User", size = 50, className = ""}) => {
     return (
         <div
         className={`relative inline-block overflow-hidden rounded-full ${className}`}
