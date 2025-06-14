@@ -8,5 +8,5 @@ handler = TradeHandler()
 
 
 @router.post("/simulate/trade")
-def simulate_trade(trade_input: TradeInput, _user=Depends(get_current_user)):
-    return handler.simulate_trade(trade_input)
+async def simulate_trade(trade_input: TradeInput, _user=Depends(get_current_user)):
+    return await handler.simulate_trade(trade_input, _user["uid"])

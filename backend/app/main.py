@@ -9,7 +9,7 @@ from app.utils.firebase_auth import init_firebase
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from firebase_admin import auth
+from app.db import trade_repository
 
 load_dotenv()
 
@@ -17,6 +17,9 @@ load_dotenv()
 async def lifespan(app: FastAPI):
     # This runs on startup
     task = asyncio.create_task(shared_orderbook.update())
+    
+    trade_repository.init_indexes()  # Ensure indexes are created on startup
+    
     yield
     # This runs on shutdown (cancel background task)
     task.cancel()
@@ -39,21 +42,3 @@ app.add_middleware(
 )
 
 app.include_router(app_router)
-
-@app.get("/test-firebase/{uid}")
-def test_firebase_user(uid: str):
-    """
-    Test Firebase Admin SDK by fetching user details from Firebase Auth.
-    """
-    try:
-        user = auth.get_user(uid)
-        return {
-            "uid": user.uid,
-            "email": user.email,
-            "provider": user.provider_id,
-            "created_at": user.user_metadata.creation_timestamp,
-        }
-    except Exception as e:
-        return {"error": str(e)}
-
-# MB8mWXGDWDche93IQgs5i5IwRaA3

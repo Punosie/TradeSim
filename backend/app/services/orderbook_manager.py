@@ -37,4 +37,16 @@ class LatestOrderbook(dict):
         """Return the symbol from the latest orderbook."""
         return self.get("symbol", "")
     
+    def get_timestamp(self):
+        """Return the timestamp from the latest orderbook."""
+        return self.get("timestamp", "")
+    
+    def get_exchange(self):
+        """Return the exchange from the latest orderbook."""
+        return self.get("exchange", "OKX")
+    
+    def get_order_type(self):
+        """Return the order type from the latest orderbook."""
+        return self.get("order_type", "market")
+    
 shared_orderbook = LatestOrderbook()
