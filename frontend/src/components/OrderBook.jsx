@@ -38,7 +38,6 @@ const OrderBook = () => {
 
     useEffect(() => {
         const socket = subscribeOrderbook(WS_URL, msgCallback)
-        console.log("Subscribed to orderbook updates")
     }, [])
 
 

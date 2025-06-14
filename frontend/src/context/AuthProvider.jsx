@@ -9,7 +9,7 @@ export const AuthProvider = ({ children }) => {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
+        const unsubscribe = onAuthStateChanged(auth,(user) => {
             if (user) {
                 setUser(user);
                 setError(null);

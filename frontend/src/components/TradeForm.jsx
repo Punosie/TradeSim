@@ -1,9 +1,12 @@
 import { useState } from "react"
 import axios from "axios"
+import useAuth from "../hooks/useAuthHook";
 
 const API_URL = import.meta.env.VITE_SIM_API_URL
 
 const TradeForm = ({ onSubmitResponse }) => {
+    const { user } = useAuth();
+
     const [formData, setFormData] = useState({
         exchange: 'OKX',
         asset: 'BTC-USDT-SWAP',
@@ -11,18 +14,24 @@ const TradeForm = ({ onSubmitResponse }) => {
         qty_usd: '1000'
     })
 
+    const isSubmitDisabled = !formData.qty_usd || formData.qty_usd <= 0;
+
     const handleSubmit = async (e) => {
         e.preventDefault()
-
-        console.log("Form submitted with data:", formData)
-        if (!API_URL) {
-            console.error("API URL is not defined")
+        
+        if (!user) {
+            console.error("User is not authenticated")
             return
         }
 
         try {
-            const res = await axios.post(`${API_URL}`, formData)
-            console.log("Response from API:", res.data)
+            const IDToken = await user.getIdToken();
+
+            const res = await axios.post(`${API_URL}`, formData, {
+                headers: {
+                    Authorization: `Bearer ${IDToken}`
+                }
+            })
             onSubmitResponse(res.data)
         }
         catch (err) {
@@ -89,11 +98,11 @@ const TradeForm = ({ onSubmitResponse }) => {
                 </div>
                 <button
                     type="submit"
-                    className={`m-2 md:mt-6 w-full p-1.5 md:p-2 border text-xs sm:text-sm md:text-md xl:text-lg rounded-md transition duration-300 ${!formData.qty_usd || formData.qty_usd <= 0
+                    className={`m-2 md:mt-6 w-full p-1.5 md:p-2 border text-xs sm:text-sm md:text-md xl:text-lg rounded-md transition duration-300 ${(!user || isSubmitDisabled)
                         ? 'border-slate-500 text-slate-400 cursor-not-allowed'
                         : 'border-emerald-500 text-white hover:bg-emerald-600'
                         }`}
-                    disabled={!formData.qty_usd || formData.qty_usd <= 0}
+                    disabled={!user || isSubmitDisabled}
                     aria-label="Submit Trade"
                 >
                     <span className="">SUBMIT TRADE</span>

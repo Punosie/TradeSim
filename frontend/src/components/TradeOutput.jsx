@@ -1,18 +1,34 @@
+import useAuth from "../hooks/useAuthHook";
+
 const TradeOutput = ({ result }) => {
+    const { user } = useAuth();
+
+    if (!user) {
+        return (
+            <div className="bg-slate-800 text-sm md:text-lg rounded-xl p-6 shadow-md w-full mx-auto mt-6">
+                <p className="text-red-500 text-sm md:text-md xl:text-xl text-center">
+                    Please log in to submit a trade and view the output.
+                </p>
+            </div>
+        );
+    }
     return (
         <div className="bg-slate-800 text-sm md:text-lg rounded-xl p-6 shadow-md w-full mx-auto mt-6">
             {!result ? (
-                <p className="text-slate-400 font-medium leading-loose text-center">
-                    <span className="block text-slate-300 font-semibold">
-                        No trade submitted yet.
-                    </span>
-                    <span className="block text-slate-300">
-                        Please submit a trade to see the output.
-                    </span>
-                    <span className="block text-emerald-400 font-semibold">
-                        Happy Trading!
-                    </span>
-                </p>
+                <>
+                    <p className="text-slate-400 font-medium leading-loose text-center">
+                        <span className="block text-slate-300 font-semibold">
+                            No trade submitted yet.
+                        </span>
+                        <span className="block text-slate-300">
+                            Please submit a trade to see the output.
+                        </span>
+                        <span className="block text-emerald-400 font-semibold">
+                            Happy Trading!
+                        </span>
+                    </p>
+                </>
+
             ) : (
                 <>
                     <h2

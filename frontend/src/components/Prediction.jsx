@@ -17,10 +17,10 @@ const Prediction = () => {
 
     useEffect(() => {
         const socket = subscribeMidPricePred(WS_URL, msgCallback);
-        console.log("Subscribed to prediction updates");
+        // console.log("Subscribed to prediction updates");
         return () => {
             socket.close();
-            console.log("Unsubscribed from prediction updates");
+            // console.log("Unsubscribed from prediction updates");
         };
     }, []);
 

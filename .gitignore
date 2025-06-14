@@ -16,3 +16,6 @@ build/
 
 # Visual Studio Code settings
 .vscode/
+
+#Firebase configuration
+firebase-adminsdk.json
