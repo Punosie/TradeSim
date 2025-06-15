@@ -52,3 +52,11 @@ class TradeHandler:
 
         return trade_log.model_dump()
 
+    def get_trade_history_csv(self, user_id: str) -> str:
+        """Retrieve the trade history for a specific user and return as a CSV string."""
+        csv_data = trade_repository.get_trades_csv_by_user(user_id)
+
+        if not csv_data:
+            return "NO TRADES YET"
+
+        return csv_data

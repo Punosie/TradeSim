@@ -18,7 +18,7 @@ const About = () => {
       {/* Content */}
       <div className="relative z-10 flex-grow px-4 py-8 max-w-5xl mx-auto">
         <h1 className="text-4xl md:text-6xl font-bold text-center text-slate-200 mt-10">
-          The <span className="text-pink-400">Simulator</span>
+          The <span className="text-pink-500">Simulator</span>
         </h1>
 
         <div className=" text-xs md:text-md xl:text-xl text-slate-300 text-justify mt-8 space-y-6">

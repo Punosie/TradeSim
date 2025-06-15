@@ -1,6 +1,8 @@
 from app.schemas import TradeOutput
 from pymongo.collection import Collection
 from pymongo import IndexModel
+import csv
+import io
 
 
 class TradeRepository:
@@ -25,3 +27,23 @@ class TradeRepository:
         """ Retrieve trades for a specific user, sorted by timestamp. """
         cursor = self.collection.find({"user_id": user_id}).sort("timestamp", -1).limit(limit)
         return list(cursor)
+
+    def get_trades_csv_by_user(self, user_id: str) -> str:
+        """ Retrieve all trades for a specific user and return as CSV string. """
+        cursor = self.collection.find({"user_id": user_id}).sort("timestamp", -1)
+        trades = list(cursor)
+
+        if not trades:
+            return ""
+        
+        for trade in trades:
+            trade.pop("_id", None)
+
+        # Convert MongoDB documents to CSV
+        output = io.StringIO()
+        output.write('\ufeff')
+        writer = csv.DictWriter(output, fieldnames=trades[0].keys())
+        writer.writeheader()
+        writer.writerows(trades)
+
+        return output.getvalue()

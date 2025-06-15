@@ -14,6 +14,6 @@ try:
 except Exception as e:
     print("❌ MongoDB connection error:", e)
 
-from .schema import TradeRepository
+from .trade_repository import TradeRepository
 
 trade_repository = TradeRepository(client["sim_trades"]["trades"])

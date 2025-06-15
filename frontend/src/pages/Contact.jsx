@@ -24,7 +24,7 @@ const Contact = () => {
             {/* Content */}
             <div className="relative z-10 flex-grow px-4 py-8 max-w-5xl mx-auto">
                 <h1 className="text-4xl md:text-6xl font-bold text-center text-slate-200 md:mt-10">
-                    Get in <span className="text-pink-400">Touch</span>
+                    Get in <span className="text-pink-500">Touch</span>
                 </h1>
 
                 <div className="mt-10 text-slate-300 text-center space-y-4 text-md md:text-lg">
