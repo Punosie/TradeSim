@@ -54,7 +54,7 @@ function Features() {
       <div className="container">
         <div className="row">
           {FeatureList.map((feature, idx) => (
-            <div key={idx} className={clsx('col col--4')}>
+            <div key={idx} className={clsx('col col--4 margin-bottom--lg', styles.feature)}>
               <div className={styles.featureCard}>
                 <h3 className={styles.featureTitle}>{feature.title}</h3>
                 <p className={styles.featureDescription}>{feature.description}</p>

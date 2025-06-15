@@ -51,6 +51,7 @@ const OrderBook = () => {
                         theme={themes.bidTheme}
                         rowData={bids}
                         columnDefs={columnDefs}
+                        getRowId={(params) => params.data.price.toString()}
                         suppressMovableColumns={true}
                         suppressDragLeaveHidesColumns={true}
                     />
@@ -62,6 +63,7 @@ const OrderBook = () => {
                         theme={themes.askTheme}
                         rowData={asks}
                         columnDefs={columnDefs}
+                        getRowId={(params) => params.data.price.toString()}
                         suppressMovableColumns={true}
                         suppressDragLeaveHidesColumns={true}
                     />
