@@ -56,7 +56,7 @@ class SimulateMarketOrder:
         net_qty = total_qty - fee_btc
         
         # Calculate slippage
-        slippage_percent = SlippageCalculator.calculate_slippage(book, average_price)
+        slippage_percent = SlippageCalculator.calculate_slippage(book, average_price, side)
         
         end = time.perf_counter()
         
