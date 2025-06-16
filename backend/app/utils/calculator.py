@@ -30,21 +30,31 @@ class FeeCalculator:
 class SlippageCalculator:
 
     @staticmethod
-    def calculate_slippage(asks: list, average_price: float) -> float:
+    def calculate_slippage(book: list, average_price: float, side: str) -> float:
         """
-        Calculate slippage percentage for a market buy order.
-        Slippage = ((average execution price - best ask price) / best ask price) * 100
+        Calculate slippage percentage for a market order.
+
+        Slippage (buy) = ((avg_price - best_ask) / best_ask) * 100
+        Slippage (sell) = ((best_bid - avg_price) / best_bid) * 100
 
         Args:
-        asks (list): List of orderbook asks (price, qty).
-        average_price (float): The weighted average price paid.
+        book (list): List of (price, qty) from the relevant side of the book.
+        average_price (float): The weighted average price executed.
+        side (str): 'buy' or 'sell'
 
         Returns:
-        float: Slippage percent (positive means you paid more than expected).
+        float: Slippage percent. Positive = worse price than best.
         """
-        if not asks or average_price == 0:
+        if not book or average_price == 0:
             return 0.0
 
-        best_ask = float(asks[0][0])  # Best ask price at top of orderbook
-        slippage = ((average_price - best_ask) / best_ask) * 100
+        best_price = float(book[0][0])
+
+        if side == "buy":
+            slippage = ((average_price - best_price) / best_price) * 100
+        elif side == "sell":
+            slippage = ((best_price - average_price) / best_price) * 100
+        else:
+            raise ValueError("Invalid side. Must be 'buy' or 'sell'.")
+
         return slippage

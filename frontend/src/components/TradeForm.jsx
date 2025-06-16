@@ -2,7 +2,7 @@ import { useState } from "react"
 import axios from "axios"
 import useAuth from "../hooks/useAuthHook";
 
-const API_URL = import.meta.env.VITE_SIM_API_URL
+const API_URL = import.meta.env.VITE_API_URL;
 
 const TradeForm = ({ onSubmitResponse }) => {
     const { user } = useAuth();
@@ -16,7 +16,7 @@ const TradeForm = ({ onSubmitResponse }) => {
 
     const isSubmitDisabled = !formData.qty_usd || formData.qty_usd <= 0;
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e, side) => {
         e.preventDefault()
         
         if (!user) {
@@ -27,7 +27,12 @@ const TradeForm = ({ onSubmitResponse }) => {
         try {
             const IDToken = await user.getIdToken();
 
-            const res = await axios.post(`${API_URL}`, formData, {
+            const payload = {
+                ...formData,
+                side: side // Inject side into payload
+            }
+
+            const res = await axios.post(`${API_URL}/simulate/trade`, payload, {
                 headers: {
                     Authorization: `Bearer ${IDToken}`
                 }
@@ -96,8 +101,9 @@ const TradeForm = ({ onSubmitResponse }) => {
                         />
                     </label>
                 </div>
-                <button
-                    type="submit"
+                <div className="flex w-full" >
+                    <button
+                    onClick={(e) => handleSubmit(e, 'buy')}
                     className={`m-2 md:mt-6 w-full p-1.5 md:p-2 border text-xs sm:text-sm md:text-md xl:text-lg rounded-md transition duration-300 ${(!user || isSubmitDisabled)
                         ? 'border-slate-500 text-slate-400 cursor-not-allowed'
                         : 'border-emerald-500 text-white hover:bg-emerald-600'
@@ -105,8 +111,20 @@ const TradeForm = ({ onSubmitResponse }) => {
                     disabled={!user || isSubmitDisabled}
                     aria-label="Submit Trade"
                 >
-                    <span className="">SUBMIT TRADE</span>
+                    <span className="">BUY</span>
                 </button>
+                <button
+                    onClick={(e) => handleSubmit(e, 'sell')}
+                    className={`m-2 md:mt-6 w-full p-1.5 md:p-2 border text-xs sm:text-sm md:text-md xl:text-lg rounded-md transition duration-300 ${(!user || isSubmitDisabled)
+                        ? 'border-slate-500 text-slate-400 cursor-not-allowed'
+                        : 'border-red-500 text-white hover:bg-red-600'
+                        }`}
+                    disabled={!user || isSubmitDisabled}
+                    aria-label="Submit Trade"
+                >
+                    <span className="">SELL</span>
+                </button>
+                </div>
             </form>
         </>
     )

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { subscribeMidPricePred } from "../services/MidPricePred";
 
-const WS_URL = import.meta.env.VITE_MP_PRED_URL;
+const WS_URL = import.meta.env.VITE_WS_URL;
 
 const Prediction = () => {
     const [mpPred, setMpPred] = useState([]);

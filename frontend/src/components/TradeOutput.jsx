@@ -1,5 +1,5 @@
 import useAuth from "../hooks/useAuthHook";
-const API_URL = import.meta.env.VITE_TRADE_HISTORY_URL;
+const API_URL = import.meta.env.VITE_API_URL;
 
 const TradeOutput = ({ result }) => {
     const { user } = useAuth();
@@ -22,7 +22,7 @@ const TradeOutput = ({ result }) => {
 
             const IDToken = await user.getIdToken();
 
-            const response = await fetch(`${API_URL}`, {
+            const response = await fetch(`${API_URL}/trade-history`, {
                 method: "GET",
                 headers: {
                     Authorization: `Bearer ${IDToken}`,
@@ -82,6 +82,7 @@ const TradeOutput = ({ result }) => {
                                 "asset",
                                 "order_type",
                                 "qty_usd",
+                                "side",
                                 "filled_qty",
                                 "average_price",
                                 "total_spent",
