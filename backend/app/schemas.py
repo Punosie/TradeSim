@@ -13,6 +13,8 @@ class TradeInput(BaseModel):
     order_type: Literal["market"] = Field(
         "market", description="Type of order")
     qty_usd: float = Field(..., description="Quantity in USD")
+    side: Literal["buy", "sell"] = Field(
+        "buy", description="Trade side (buy/sell)")
 
 
 class TradeOutput(BaseModel):
@@ -24,6 +26,7 @@ class TradeOutput(BaseModel):
     exchange: str = Field(..., description="Exchange used for the trade")
     asset: str = Field(..., description="Asset traded")
     order_type: str = Field(..., description="Order type")
+    side: str = Field(..., description="Trade side (buy/sell)")
     qty_usd: float = Field(..., description="Amount in USD used for the trade")
     filled_qty: float = Field(..., description="Quantity filled in base asset")
     fee_usd: float = Field(..., description="Fee charged in USD")

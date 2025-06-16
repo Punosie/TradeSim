@@ -2,7 +2,7 @@ from app.db import trade_repository
 from app.schemas import TradeInput, TradeOutput
 from app.config import TRADE_LOG_PATH
 from app.services.orderbook_manager import shared_orderbook
-from app.services.simulation_service import SimulateBuy
+from app.services.simulation_service import SimulateMarketOrder
 
 
 class TradeHandler:
@@ -13,7 +13,7 @@ class TradeHandler:
     def __init__(self):
         """Initialize the TradeHandler with a shared orderbook and simulator."""
         self.orderbook = shared_orderbook
-        self.simulator = SimulateBuy()
+        self.simulator = SimulateMarketOrder()
 
     async def simulate_trade(self, trade_input: TradeInput, user_id: str):
         """Simulate a trade based on the input data."""
@@ -24,13 +24,15 @@ class TradeHandler:
             }
 
         try:
-            asks = self.orderbook.get_asks()
-
             if trade_input.qty_usd <= 0:
                 raise ValueError("Quantity in USD must be greater than 0.")
 
-        finally:
-            result = self.simulator.execute(asks, trade_input.qty_usd)
+            side = trade_input.side.lower()
+            result = self.simulator.execute(side, trade_input.qty_usd)
+
+        except Exception as e:
+            return {"error": str(e)}
+
 
         trade_log = TradeOutput(
             user_id=user_id,
@@ -39,6 +41,7 @@ class TradeHandler:
             asset=self.orderbook.get_symbol(),
             order_type=self.orderbook.get_order_type(),
             qty_usd=trade_input.qty_usd,
+            side = trade_input.side,
             filled_qty=result.get("filled_qty", 0),
             fee_usd=result.get("fee_usd", 0),
             slippage=result.get("slippage_percent", 5.0),

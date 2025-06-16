@@ -1,5 +1,5 @@
 export function subscribeMidPricePred(url, onMessageCallback) {
-    const socket = new WebSocket(url);
+    const socket = new WebSocket(`${url}/ws/prediction`);
 
     socket.addEventListener("open", (event) => {
         console.log("WebSocket connection established.");

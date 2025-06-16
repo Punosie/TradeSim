@@ -7,7 +7,7 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 
 import { themes } from "../utils/ag_theme";
 
-const WS_URL = import.meta.env.VITE_WS
+const WS_URL = import.meta.env.VITE_WS_URL
 
 const OrderBook = () => {
     const [bids, setBids] = useState([]);

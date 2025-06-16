@@ -1,5 +1,5 @@
 export function subscribeOrderbook(url, onMessageCallback){
-    const socket = new WebSocket(url);
+    const socket = new WebSocket(`${url}/ws/okx`);
 
     socket.addEventListener("open", (event) => {
         console.log("WebSocket connection established.");
