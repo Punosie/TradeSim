@@ -66,7 +66,7 @@ class SimulateMarketOrder:
             "side": side,
             "filled_qty": round(net_qty, 4),  # Crypto received after fees
             "average_price": average_price,
-            "total_value" if side == "buy" else "total_received": round(total_value, 2),
+            "total_value": round(total_value, 2),
             "slippage_percent": round(slippage_percent, 2),
             "fee_usd": round(fee_usd, 4),
             "latency": str(self.latency) + "ms"
