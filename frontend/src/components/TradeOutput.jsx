@@ -85,7 +85,7 @@ const TradeOutput = ({ result }) => {
                                 "side",
                                 "filled_qty",
                                 "average_price",
-                                "total_spent",
+                                "total_value",
                             ].map((key) => (
                                 <div
                                     className="grid grid-cols-2 border-b border-slate-700 pb-1"

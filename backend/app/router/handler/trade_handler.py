@@ -46,7 +46,7 @@ class TradeHandler:
             fee_usd=result.get("fee_usd", 0),
             slippage=result.get("slippage_percent", 5.0),
             average_price=result.get("average_price", 0),
-            total_spent=result.get("total_spent", 0),
+            total_value=result.get("total_value", 0),
             latency=result.get("latency", "N/A"),
             status="success" if result.get("filled_qty", 0) > 0 else "failed",
         )

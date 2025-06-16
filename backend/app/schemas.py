@@ -32,7 +32,7 @@ class TradeOutput(BaseModel):
     fee_usd: float = Field(..., description="Fee charged in USD")
     slippage: float = Field(..., description="Slippage percentage")
     average_price: float = Field(..., description="Average price of executed trade")
-    total_spent: float = Field(..., description="Total USD spent")
+    total_value: float = Field(..., description="Total value of the trade in USD")
     latency: str = Field(..., description="Simulated latency or delay info")
     status: Literal["success", "failed"] = Field(..., description="Execution status")
     
