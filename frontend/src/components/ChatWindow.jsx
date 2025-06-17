@@ -38,6 +38,11 @@ const ChatWindow = ({ user }) => {
         }
     }, [messages, user]);
 
+    const clearHistory = () => {
+        localStorage.removeItem(STORAGE_KEY);
+        setMessages([]);
+    };
+
 
     // Auto-scroll
     useEffect(() => {
@@ -127,7 +132,7 @@ const ChatWindow = ({ user }) => {
 
             {/* Input Area */}
             <div>
-                <InputForm user={user} onResponse={handleAIResponse} onUserInput={handleUserInput} />
+                <InputForm user={user} onResponse={handleAIResponse} onUserInput={handleUserInput} clearHistory={clearHistory}/>
             </div>
         </div>
     );

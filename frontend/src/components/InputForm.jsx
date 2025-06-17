@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { IoSend } from "react-icons/io5";
+import { FiTrash2 } from "react-icons/fi";
 
 const API_URL = import.meta.env.VITE_API_URL;
 const COOLDOWN_MS = 3000; // 3 seconds
 
-const InputForm = ({ user, model = "gemini-2.0-flash", onResponse, onUserInput }) => {
+const InputForm = ({ user, model = "gemini-2.0-flash", onResponse, onUserInput, clearHistory }) => {
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -66,6 +67,14 @@ const InputForm = ({ user, model = "gemini-2.0-flash", onResponse, onUserInput }
                     Please wait before sending another message...
                 </div>
             )}
+            <button
+                type="button"
+                onClick={clearHistory}
+                className="p-3 sm:p-4 text-xl bg-slate-600 hover:bg-slate-500 text-white rounded-full flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Clear History"
+            >
+                <FiTrash2 />
+            </button>
             <textarea
                 ref={textareaRef}
                 value={input}
