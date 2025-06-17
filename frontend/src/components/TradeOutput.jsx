@@ -28,35 +28,29 @@ const TradeOutput = ({ result }) => {
     const handleclick = async () => {
         try {
             console.log("Downloading trade history...");
-
             const IDToken = await user.getIdToken();
 
             const response = await axios.get(`${API_URL}/trade-history`, {
                 headers: {
                     Authorization: `Bearer ${IDToken}`,
                 },
+                responseType: "blob",
             });
 
-            if (!response.ok) {
-                throw new Error("Failed to fetch trade history");
-            }
-
-            const blob = await response.blob();
-
-            // Create a download link
-            const url = window.URL.createObjectURL(blob);
+            const url = window.URL.createObjectURL(new Blob([response.data]));
             const a = document.createElement("a");
             a.href = url;
             a.download = "trade_history.csv";
             document.body.appendChild(a);
             a.click();
             a.remove();
-            window.URL.revokeObjectURL(url); // Clean up
+            window.URL.revokeObjectURL(url);
         } catch (err) {
             console.error("Error downloading trades:", err);
             alert("Failed to download trade history.");
         }
     };
+
 
     return (
         <>
