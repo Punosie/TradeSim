@@ -50,6 +50,11 @@ const Navbar = () => {
               }`}>
               Simulator
             </NavLink>
+            <NavLink to="/ask-ai" className={({ isActive }) =>
+              `flex items-center justify-center h-10 px-4 text-sm sm:text-md lg:text-lg transition-transform hover:scale-105 ${isActive ? "text-pink-500 font-semibold" : "text-slate-300 hover:text-pink-500"
+              }`}>
+              Ask AI
+            </NavLink>
             <NavLink to="/about" className={({ isActive }) =>
               `flex items-center justify-center h-10 px-4 text-sm sm:text-md lg:text-lg transition-transform hover:scale-105 ${isActive ? "text-pink-500 font-semibold" : "text-slate-300 hover:text-pink-500"
               }`}>
@@ -123,6 +128,7 @@ const Navbar = () => {
         <div className="flex flex-col items-end px-6 py-4 space-y-4">
           <NavLink to="/" onClick={handleLinkClick} className="text-slate-200 text-xs sm:text-sm hover:text-pink-500 transition-transform hover:translate-x-1">Home</NavLink>
           <NavLink to="/sim" onClick={handleLinkClick} className="text-slate-200 text-xs sm:text-sm hover:text-pink-500 transition-transform hover:translate-x-1">Simulator</NavLink>
+          <NavLink to="/ask-ai" onClick={handleLinkClick} className="text-slate-200 text-xs sm:text-sm hover:text-pink-500 transition-transform hover:translate-x-1">Ask AI</NavLink>
           <NavLink to="/about" onClick={handleLinkClick} className="text-slate-200 text-xs sm:text-sm hover:text-pink-500 transition-transform hover:translate-x-1">About</NavLink>
           <a
             href="https://punosie.github.io/TradeSim/"

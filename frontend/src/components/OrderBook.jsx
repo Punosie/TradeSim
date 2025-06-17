@@ -54,6 +54,7 @@ const OrderBook = () => {
                         getRowId={(params) => params.data.price.toString()}
                         suppressMovableColumns={true}
                         suppressDragLeaveHidesColumns={true}
+                        animateRows={false}
                     />
                 </div>
                 {/* Asks */}
@@ -66,6 +67,7 @@ const OrderBook = () => {
                         getRowId={(params) => params.data.price.toString()}
                         suppressMovableColumns={true}
                         suppressDragLeaveHidesColumns={true}
+                        animateRows={false}
                     />
                 </div>
             </div>

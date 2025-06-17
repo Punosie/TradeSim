@@ -27,3 +27,12 @@
   border-radius: 0.75rem !important;
   overflow: hidden;
 }
+
+/* In index.css or App.css */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
+}
