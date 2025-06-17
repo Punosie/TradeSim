@@ -1,8 +1,17 @@
+import axios from "axios";
 import useAuth from "../hooks/useAuthHook";
 const API_URL = import.meta.env.VITE_API_URL;
 
 const TradeOutput = ({ result }) => {
-    const { user } = useAuth();
+    const { user, loading } = useAuth();
+
+    if (loading) {
+        return (
+            <div className="text-sm md:text-lg rounded-xl p-6 shadow-md w-full mx-auto mt-6">
+                <p className="text-white text-center text-md xl:text-xl">Loading...</p>
+            </div>
+        );
+    }
 
     if (!user) {
         return (
@@ -22,8 +31,7 @@ const TradeOutput = ({ result }) => {
 
             const IDToken = await user.getIdToken();
 
-            const response = await fetch(`${API_URL}/trade-history`, {
-                method: "GET",
+            const response = await axios.get(`${API_URL}/trade-history`, {
                 headers: {
                     Authorization: `Bearer ${IDToken}`,
                 },
