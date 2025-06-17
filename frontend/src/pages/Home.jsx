@@ -1,11 +1,22 @@
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { signInWithGoogle, signInWithGithub } from '../utils/auth';
+import useAuth from '../hooks/useAuthHook';
 import Navbar from '../components/Navbar';
 
 const Home = () => {
     const navigate = useNavigate();
     const [isSigningIn, setIsSigningIn] = useState(false);
+    const { user, loading } = useAuth();
+
+    if (loading) {
+        return (
+            <div className="text-sm md:text-lg rounded-xl p-6 shadow-md w-full mx-auto mt-6 animate-in fade-in zoom-in duration-700">
+                <p className="text-white text-center text-md xl:text-xl">Loading...</p>
+            </div>
+        );
+    }
+
 
     const handleGoogleSignIn = async () => {
         if (isSigningIn) return;
@@ -72,7 +83,8 @@ const Home = () => {
                         Simulate your crypto trades with precision. Analyze slippage, fees, and market impact before you execute — built for traders, quants, and analysts.
                     </p>
 
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                    { !user && (
+                        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                         <button
                             onClick={handleGoogleSignIn}
                             className="rounded-lg px-2 py-1 md:px-6 md:py-3 font-medium border-2 border-pink-700 text-slate-300 hover:bg-pink-800 hover:text-white duration-300"
@@ -87,6 +99,7 @@ const Home = () => {
                             <span className="text-sm sm:text-md md:text-lg lg:text-xl">Sign in with GitHub</span>
                         </button>
                     </div>
+                    )}
                 </div>
             </div>
         </div>
