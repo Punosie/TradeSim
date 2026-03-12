@@ -42,7 +42,7 @@ joblib==1.5.1
 kiwisolver==1.4.7
 msgpack==1.1.1
 numpy==2.0.2
-orjson==3.10.18
+orjson==3.11.6
 pandas==2.2.3
 pillow==11.2.1
 pipdeptree==2.26.1
