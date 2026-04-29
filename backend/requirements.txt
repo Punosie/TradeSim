@@ -44,7 +44,7 @@ msgpack==1.1.1
 numpy==2.0.2
 orjson==3.10.18
 pandas==2.2.3
-pillow==11.2.1
+pillow==12.2.0
 pipdeptree==2.26.1
 proto-plus==1.26.1
 protobuf==6.31.1
