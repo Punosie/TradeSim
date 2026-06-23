@@ -40,7 +40,7 @@ idna==3.10
 importlib_resources==6.5.2
 joblib==1.5.1
 kiwisolver==1.4.7
-msgpack==1.1.1
+msgpack==1.2.1
 numpy==2.0.2
 orjson==3.10.18
 pandas==2.2.3
