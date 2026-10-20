@@ -1,32 +1,31 @@
-import os
+import logging
+from functools import cached_property
+
+from fastapi import HTTPException
 from google import genai
+
+from app.config import GEMINI_MODEL, GOOGLE_API_KEY
 from app.schemas import PromptInput, PromptOutput
 
-API = os.getenv("GOOGLE_API_kEY")
+logger = logging.getLogger(__name__)
+
 
 class AIHandler:
-    def __init__(self):
-        self.client = genai.Client(api_key=API)
+    """Forwards prompts to Gemini through a single shared async client."""
 
-    async def handle_request(self, prompt_input: PromptInput, user_id: str) -> PromptOutput:
-        """
-        Handles the request to the AI model and returns the response.
-        
-        Args:
-            prompt (str): The question or prompt to send to the AI model.
-        
-        Returns:
-            PromptOutput: A dictionary containing the AI's response.
-        """
-        if not user_id:
-            return PromptOutput(text="Sign in to ask the AI model a question.")
-        
-        response = self.client.models.generate_content(
-            model=prompt_input.model,
-            contents=prompt_input.prompt
-        )
-        
-        if not response or not response.text:
-            return PromptOutput(text="No response from AI model.")
-        
-        return PromptOutput(text=response.text)
+    @cached_property
+    def client(self) -> genai.Client:
+        return genai.Client(api_key=GOOGLE_API_KEY)
+
+    async def handle_request(self, prompt_input: PromptInput) -> PromptOutput:
+        """Send the prompt to the configured Gemini model and return its text."""
+        try:
+            response = await self.client.aio.models.generate_content(
+                model=GEMINI_MODEL,
+                contents=prompt_input.prompt,
+            )
+        except Exception:
+            logger.exception("Gemini request failed")
+            raise HTTPException(status_code=502, detail="AI model request failed.")
+
+        return PromptOutput(text=response.text or "No response from AI model.")

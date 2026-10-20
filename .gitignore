@@ -1,11 +1,16 @@
 # Environment variable definitions
 *.env
+.env
+.env.*
+!.env.example
 
-# Python virtual environment directory
+# Python virtual environments and caches
 venv/
-
-# Python cache files
+.venv/
 __pycache__/
+
+# Node
+node_modules/
 
 # Log files
 *.log
@@ -13,9 +18,10 @@ __pycache__/
 # Build artifacts
 dist/
 build/
+.vercel/
 
 # Visual Studio Code settings
 .vscode/
 
-#Firebase configuration
+# Firebase Admin credentials
 firebase-adminsdk.json

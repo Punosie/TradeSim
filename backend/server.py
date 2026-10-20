@@ -1,5 +1,6 @@
 import uvicorn
-from app.config import HOST, PORT
+
+from app.config import ENV, HOST, PORT
 
 if __name__ == "__main__":
-    uvicorn.run("app.main:app", host=HOST, port=PORT, reload=True)
+    uvicorn.run("app.main:app", host=HOST, port=PORT, reload=ENV == "dev")

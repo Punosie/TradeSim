@@ -1,19 +1,11 @@
-import os
-from dotenv import load_dotenv
-from pymongo.mongo_client import MongoClient
+from pymongo import AsyncMongoClient
 from pymongo.server_api import ServerApi
 
-load_dotenv()
-URL = os.getenv("MONGO_URL")
-
-client = MongoClient(URL, server_api=ServerApi("1"))
-
-try:
-    client.admin.command("ping")
-    print("✅ Connected to MongoDB!")
-except Exception as e:
-    print("❌ MongoDB connection error:", e)
+from app.config import MONGO_COLLECTION, MONGO_DB, MONGO_URL
 
 from .trade_repository import TradeRepository
 
-trade_repository = TradeRepository(client["sim_trades"]["trades"])
+# The client connects lazily, so creating it at import time does no I/O.
+client: AsyncMongoClient = AsyncMongoClient(MONGO_URL, server_api=ServerApi("1"))
+
+trade_repository = TradeRepository(client[MONGO_DB][MONGO_COLLECTION])
