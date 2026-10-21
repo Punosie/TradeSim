@@ -1,9 +1,8 @@
 import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-import {getAuth} from "firebase/auth";
+import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
-    apiKey : import.meta.env.VITE_FIREBASE_API_KEY,
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
     authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
     projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
     storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
@@ -14,6 +13,12 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const analytics = getAnalytics(app);
 
-export { app, analytics, auth };
+// Load Google Analytics off the critical path, and only where it is supported
+const initAnalytics = async () => {
+    if (!firebaseConfig.measurementId) return;
+    const { getAnalytics, isSupported } = await import("firebase/analytics");
+    if (await isSupported()) getAnalytics(app);
+};
+
+export { app, auth, initAnalytics };

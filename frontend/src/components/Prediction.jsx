@@ -1,28 +1,15 @@
-import { useState, useEffect } from "react";
-import { subscribeMidPricePred } from "../services/MidPricePred";
-
-const WS_URL = import.meta.env.VITE_WS_URL;
+import { useState, useCallback } from "react";
+import useWebSocket from "../hooks/useWebSocket";
+import { WS_URL } from "../lib/api";
 
 const Prediction = () => {
-    const [mpPred, setMpPred] = useState([]);
+    const [mpPred, setMpPred] = useState(null);
 
-    const msgCallback = (data) => {
-        if (data && data.prediction) {
-            setMpPred(data.prediction[0]);
-        }
-        else {
-            console.warn("Received data does not contain prediction:", data, typeof data);
-        }
-    }
-
-    useEffect(() => {
-        const socket = subscribeMidPricePred(WS_URL, msgCallback);
-        // console.log("Subscribed to prediction updates");
-        return () => {
-            socket.close();
-            // console.log("Unsubscribed from prediction updates");
-        };
+    const onMessage = useCallback((data) => {
+        if (data?.prediction) setMpPred(data.prediction[0]);
     }, []);
+
+    useWebSocket(WS_URL && `${WS_URL}/ws/prediction`, onMessage);
 
     return (
         <div className="bg-slate-800 text-sm md:text-lg rounded-xl p-6 shadow-md w-full mx-auto mt-6">

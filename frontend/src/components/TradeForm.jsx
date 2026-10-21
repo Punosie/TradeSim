@@ -1,11 +1,10 @@
 import { useState } from "react"
-import axios from "axios"
 import useAuth from "../hooks/useAuthHook";
-
-const API_URL = import.meta.env.VITE_API_URL;
+import api, { errorMessage } from "../lib/api";
 
 const TradeForm = ({ onSubmitResponse }) => {
     const { user } = useAuth();
+    const [submitting, setSubmitting] = useState(false);
 
     const [formData, setFormData] = useState({
         exchange: 'OKX',
@@ -14,42 +13,26 @@ const TradeForm = ({ onSubmitResponse }) => {
         qty_usd: '1000'
     })
 
-    const isSubmitDisabled = !formData.qty_usd || formData.qty_usd <= 0;
+    const isSubmitDisabled = submitting || !formData.qty_usd || Number(formData.qty_usd) <= 0;
 
     const handleSubmit = async (e, side) => {
         e.preventDefault()
-        
-        if (!user) {
-            console.error("User is not authenticated")
-            return
-        }
+        if (!user || isSubmitDisabled) return
 
+        setSubmitting(true)
         try {
-            const IDToken = await user.getIdToken();
-
-            const payload = {
+            const res = await api.post("/simulate/trade", {
                 ...formData,
-                side: side // Inject side into payload
-            }
-
-            const res = await axios.post(`${API_URL}/simulate/trade`, payload, {
-                headers: {
-                    Authorization: `Bearer ${IDToken}`
-                }
+                qty_usd: Number(formData.qty_usd),
+                side,
             })
             onSubmitResponse(res.data)
         }
         catch (err) {
-            console.error("Error submitting form:", err)
-            onSubmitResponse({ error: "API request failed" })
+            onSubmitResponse({ error: errorMessage(err, "Trade request failed.") })
         }
         finally {
-            setFormData({
-                exchange: 'OKX',
-                asset: 'BTC-USDT-SWAP',
-                order_type: 'market',
-                qty_usd: '1000'
-            })
+            setSubmitting(false)
         }
     }
 
@@ -104,7 +87,7 @@ const TradeForm = ({ onSubmitResponse }) => {
                 <div className="flex w-full" >
                     <button
                     onClick={(e) => handleSubmit(e, 'buy')}
-                    className={`m-2 md:mt-6 w-full p-1.5 md:p-2 border text-xs sm:text-sm md:text-md xl:text-lg rounded-md transition duration-300 ${(!user || isSubmitDisabled)
+                    className={`m-2 md:mt-6 w-full p-1.5 md:p-2 border text-xs sm:text-sm md:text-base xl:text-lg rounded-md transition duration-300 ${(!user || isSubmitDisabled)
                         ? 'border-slate-500 text-slate-400 cursor-not-allowed'
                         : 'border-emerald-500 text-white hover:bg-emerald-600'
                         }`}
@@ -115,7 +98,7 @@ const TradeForm = ({ onSubmitResponse }) => {
                 </button>
                 <button
                     onClick={(e) => handleSubmit(e, 'sell')}
-                    className={`m-2 md:mt-6 w-full p-1.5 md:p-2 border text-xs sm:text-sm md:text-md xl:text-lg rounded-md transition duration-300 ${(!user || isSubmitDisabled)
+                    className={`m-2 md:mt-6 w-full p-1.5 md:p-2 border text-xs sm:text-sm md:text-base xl:text-lg rounded-md transition duration-300 ${(!user || isSubmitDisabled)
                         ? 'border-slate-500 text-slate-400 cursor-not-allowed'
                         : 'border-red-500 text-white hover:bg-red-600'
                         }`}

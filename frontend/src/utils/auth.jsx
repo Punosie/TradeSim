@@ -28,7 +28,6 @@ const signInWithGithub = async () => {
 const signOut = async () => {
     try {
         await auth.signOut();
-        window.location.reload(); // Reload
     } catch (error) {
         console.error("Error signing out:", error);
         throw error;

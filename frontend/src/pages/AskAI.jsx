@@ -1,11 +1,12 @@
 import Navbar from "../components/Navbar";
 import AIChat from "../components/AI_Chat";
 import Footer from "../components/Footer";
+import Seo from '../components/Seo';
 
 const AskAI = () => {
     return (
         <div className="relative min-h-screen overflow-clip flex flex-col justify-between">
-            <title>Ask AI | TradeSim</title>
+            <Seo title="Ask AI" path="/ask-ai" description="Ask an AI assistant about trading, order books, slippage and crypto market microstructure." />
 
             {/* Background */}
             <div className="absolute inset-0 bg-gray-950">
@@ -26,7 +27,7 @@ const AskAI = () => {
             <div className="relative z-10 scroll-auto ">
                 <Navbar />
 
-                <div className="max-w-5/6 md:3/4 mx-auto my-4">
+                <div className="max-w-5/6 md:max-w-3/4 mx-auto my-4">
                     <AIChat />
                 </div>
             </div>

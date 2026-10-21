@@ -2,7 +2,7 @@ import { FaGithub, FaInstagram, FaLinkedin, FaXTwitter, FaHeart } from "react-ic
 
 const Footer = () => {
   return (
-    <footer className="w-full mt-auto px-6 py-4 border-t border-slate-700 text-slate-100 text-sm md:text-md lg:text-lg bg-transparent flex flex-col items-center justify-center gap-4">
+    <footer className="w-full mt-auto px-6 py-4 border-t border-slate-700 text-slate-100 text-sm md:text-base lg:text-lg bg-transparent flex flex-col items-center justify-center gap-4">
       <div className="flex items-center gap-2">
         <span>Made with</span>
         <FaHeart className="text-red-500 animate-pulse" />

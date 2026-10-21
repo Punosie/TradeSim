@@ -1,10 +1,11 @@
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import Seo from '../components/Seo';
 
 const About = () => {
   return (
     <div className="relative min-h-screen flex flex-col">
-      <title>About | TradeSim</title>
+      <Seo title="About" path="/about" description="Why TradeSim was built and the tech behind it: FastAPI, WebSockets, React, Vite, Tailwind CSS and AG Grid." />
       {/* Background */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 -z-10 h-full w-full px-5 py-24 [background:radial-gradient(125%_125%_at_50%_10%,#000_50%,#d07_120%)]"></div>
@@ -21,7 +22,7 @@ const About = () => {
           The <span className="text-pink-500">Simulator</span>
         </h1>
 
-        <div className=" text-xs md:text-md xl:text-xl text-slate-300 text-justify mt-8 space-y-6">
+        <div className=" text-xs md:text-base xl:text-xl text-slate-300 text-justify mt-8 space-y-6">
           <p className='animate-fade-right animate-duration-[1500ms] animate-delay-150 animate-ease-out'>
             This simulator was created to help me understand how a trading platform works — including the order book mechanics, trade execution flows, and prediction-based decision-making.
           </p>
@@ -42,7 +43,7 @@ const About = () => {
           <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center text-pink-500">
             Tech Stack
           </h2>
-          <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 text-center text-sm sm:text-md md:text-lg text-slate-300">
+          <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 text-center text-sm sm:text-base md:text-lg text-slate-300">
             {[
               { name: 'Python', shadow: 'hover:shadow-yellow-400/30' },
               { name: 'FastAPI', shadow: 'hover:shadow-emerald-400/30' },
