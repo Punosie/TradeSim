@@ -1,27 +1,24 @@
-import { signInWithGoogle, signInWithGithub, signOut } from "../utils/auth";
+import { useState } from "react";
+import { signInWithGoogle, signInWithGithub, signOut, authErrorMessage } from "../utils/auth";
 import { FaGoogle, FaGithubAlt } from "react-icons/fa6";
 import useAuth from "../hooks/useAuthHook";
 
 const LoginDialog = ({ closeDialog }) => {
     const { user } = useAuth();
+    const [error, setError] = useState(null);
 
-    const handleGoogleSignIn = async () => {
+    const signIn = (provider) => async () => {
+        setError(null);
         try {
-            await signInWithGoogle();
-            closeDialog(); // ✅ close after login
-        } catch (error) {
-            console.error("Google sign-in failed:", error);
+            await provider();
+            closeDialog();
+        } catch (err) {
+            setError(authErrorMessage(err));
         }
     };
 
-    const handleGithubSignIn = async () => {
-        try {
-            await signInWithGithub();
-            closeDialog(); // ✅ close after login
-        } catch (error) {
-            console.error("GitHub sign-in failed:", error);
-        }
-    };
+    const handleGoogleSignIn = signIn(signInWithGoogle);
+    const handleGithubSignIn = signIn(signInWithGithub);
 
     const handleLogout = async () => {
         try {
@@ -57,6 +54,9 @@ const LoginDialog = ({ closeDialog }) => {
                         <FaGithubAlt />
                     </button>
                 </div>
+            )}
+            {error && (
+                <p role="alert" className="text-xs text-rose-400 max-w-[220px]">{error}</p>
             )}
         </div>
     );

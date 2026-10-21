@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router';
 import { useState } from 'react';
-import { signInWithGoogle, signInWithGithub } from '../utils/auth';
+import { signInWithGoogle, signInWithGithub, authErrorMessage } from '../utils/auth';
 import useAuth from '../hooks/useAuthHook';
 import Navbar from '../components/Navbar';
 import Seo from '../components/Seo';
@@ -8,55 +8,25 @@ import Seo from '../components/Seo';
 const Home = () => {
     const navigate = useNavigate();
     const [isSigningIn, setIsSigningIn] = useState(false);
+    const [signInError, setSignInError] = useState(null);
     const { user, loading } = useAuth();
 
-    if (loading) {
-        return (
-            <div className="text-sm md:text-lg rounded-xl p-6 shadow-md w-full mx-auto mt-6 animate-in fade-in zoom-in duration-700">
-                <p className="text-white text-center text-base xl:text-xl">Loading...</p>
-            </div>
-        );
-    }
-
-
-    const handleGoogleSignIn = async () => {
+    const signIn = (provider) => async () => {
         if (isSigningIn) return;
         setIsSigningIn(true);
+        setSignInError(null);
         try {
-            await signInWithGoogle();
+            await provider();
             navigate("/sim");
         } catch (error) {
-            if (
-                error.code === 'auth/popup-closed-by-user' ||
-                error.code === 'auth/cancelled-popup-request'
-            ) {
-                setIsSigningIn(false);
-                return;
-            } else {
-                console.error("Google sign-in failed:", error);
-            }
+            setSignInError(authErrorMessage(error));
         } finally {
             setIsSigningIn(false);
         }
     };
 
-    const handleGithubSignIn = async () => {
-        if (isSigningIn) return;
-        setIsSigningIn(true);
-        try {
-            await signInWithGithub();
-            navigate("/sim");
-        } catch (error) {
-            if (error.code === 'auth/popup-closed-by-user') {
-                setIsSigningIn(false);
-                return;
-            } else {
-                console.error("GitHub sign-in failed:", error);
-            }
-        } finally {
-            setIsSigningIn(false);
-        }
-    };
+    const handleGoogleSignIn = signIn(signInWithGoogle);
+    const handleGithubSignIn = signIn(signInWithGithub);
 
     return (
         <div className="relative min-h-screen flex flex-col">
@@ -83,22 +53,28 @@ const Home = () => {
                         Simulate your crypto trades with precision. Analyze slippage, fees, and market impact before you execute — built for traders, quants, and analysts.
                     </p>
 
-                    { !user && (
+                    {/* The hero renders immediately; only the sign-in buttons wait for auth state */}
+                    { !loading && !user && (
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                         <button
                             onClick={handleGoogleSignIn}
-                            className="rounded-lg px-2 py-1 md:px-6 md:py-3 font-medium border-2 border-pink-700 text-slate-300 hover:bg-pink-800 hover:text-white duration-300"
+                            disabled={isSigningIn}
+                            className="rounded-lg px-2 py-1 md:px-6 md:py-3 font-medium border-2 border-pink-700 text-slate-300 hover:bg-pink-800 hover:text-white duration-300 disabled:opacity-50"
                         >
                             <span className="text-sm sm:text-base md:text-lg lg:text-xl">Sign in with Google</span>
                         </button>
 
                         <button
                             onClick={handleGithubSignIn}
-                            className="rounded-lg px-2 py-1 md:px-6 md:py-3 font-medium border-2 border-sky-700 text-slate-300 hover:bg-sky-800 hover:text-white duration-300"
+                            disabled={isSigningIn}
+                            className="rounded-lg px-2 py-1 md:px-6 md:py-3 font-medium border-2 border-sky-700 text-slate-300 hover:bg-sky-800 hover:text-white duration-300 disabled:opacity-50"
                         >
                             <span className="text-sm sm:text-base md:text-lg lg:text-xl">Sign in with GitHub</span>
                         </button>
                     </div>
+                    )}
+                    {signInError && (
+                        <p role="alert" className="mt-4 text-sm md:text-base text-rose-400">{signInError}</p>
                     )}
                 </div>
             </div>
