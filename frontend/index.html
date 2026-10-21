@@ -2,12 +2,46 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="./src/assets/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="/src/styles.css" />
-    <title>Trade Sim</title>
+    <title data-default>TradeSim – Real-Time Crypto Trade Simulator</title>
+    <meta name="description" data-default content="Simulate crypto market orders on a live OKX order book. Analyze slippage, fees and market impact, and get a 60-second mid-price prediction." />
+    <meta name="theme-color" content="#000000" />
+    <meta name="author" content="Shubhankar Kaushik" />
+    <link rel="canonical" data-default href="https://tradesim-shubhabha.vercel.app/" />
+
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Open Graph / Twitter defaults (pages override these at runtime) -->
+    <meta property="og:type" data-default content="website" />
+    <meta property="og:site_name" data-default content="TradeSim" />
+    <meta property="og:title" data-default content="TradeSim – Real-Time Crypto Trade Simulator" />
+    <meta property="og:description" data-default content="Simulate crypto market orders on a live OKX order book. Analyze slippage, fees and market impact, and get a 60-second mid-price prediction." />
+    <meta property="og:url" data-default content="https://tradesim-shubhabha.vercel.app/" />
+    <meta property="og:image" data-default content="https://tradesim-shubhabha.vercel.app/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" data-default content="summary_large_image" />
+    <meta name="twitter:creator" content="@Pun0sie" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "TradeSim",
+        "url": "https://tradesim-shubhabha.vercel.app/",
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "Web",
+        "description": "Real-time crypto trade simulator with live order book, slippage and fee analysis, and 60-second mid-price prediction.",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "author": { "@type": "Person", "name": "Shubhankar Kaushik", "url": "https://github.com/Punosie" }
+      }
+    </script>
   </head>
-  <body>
+  <body class="bg-black">
+    <noscript>TradeSim needs JavaScript to run the live trade simulator.</noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

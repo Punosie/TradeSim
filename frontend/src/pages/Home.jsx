@@ -1,8 +1,9 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { useState } from 'react';
 import { signInWithGoogle, signInWithGithub } from '../utils/auth';
 import useAuth from '../hooks/useAuthHook';
 import Navbar from '../components/Navbar';
+import Seo from '../components/Seo';
 
 const Home = () => {
     const navigate = useNavigate();
@@ -12,7 +13,7 @@ const Home = () => {
     if (loading) {
         return (
             <div className="text-sm md:text-lg rounded-xl p-6 shadow-md w-full mx-auto mt-6 animate-in fade-in zoom-in duration-700">
-                <p className="text-white text-center text-md xl:text-xl">Loading...</p>
+                <p className="text-white text-center text-base xl:text-xl">Loading...</p>
             </div>
         );
     }
@@ -21,7 +22,6 @@ const Home = () => {
     const handleGoogleSignIn = async () => {
         if (isSigningIn) return;
         setIsSigningIn(true);
-        setTimeout(() => setIsSigningIn(false), 1000);
         try {
             await signInWithGoogle();
             navigate("/sim");
@@ -60,7 +60,7 @@ const Home = () => {
 
     return (
         <div className="relative min-h-screen flex flex-col">
-            <title>TradeSim</title>
+            <Seo description="Simulate crypto market orders on a live OKX order book. Analyze slippage, fees and market impact, and get a 60-second mid-price prediction." />
 
             {/* Background */}
             <div className="absolute inset-0 -z-10 [background:radial-gradient(125%_125%_at_50%_10%,#000_50%,#d07_120%)]"></div>
@@ -89,14 +89,14 @@ const Home = () => {
                             onClick={handleGoogleSignIn}
                             className="rounded-lg px-2 py-1 md:px-6 md:py-3 font-medium border-2 border-pink-700 text-slate-300 hover:bg-pink-800 hover:text-white duration-300"
                         >
-                            <span className="text-sm sm:text-md md:text-lg lg:text-xl">Sign in with Google</span>
+                            <span className="text-sm sm:text-base md:text-lg lg:text-xl">Sign in with Google</span>
                         </button>
 
                         <button
                             onClick={handleGithubSignIn}
                             className="rounded-lg px-2 py-1 md:px-6 md:py-3 font-medium border-2 border-sky-700 text-slate-300 hover:bg-sky-800 hover:text-white duration-300"
                         >
-                            <span className="text-sm sm:text-md md:text-lg lg:text-xl">Sign in with GitHub</span>
+                            <span className="text-sm sm:text-base md:text-lg lg:text-xl">Sign in with GitHub</span>
                         </button>
                     </div>
                     )}

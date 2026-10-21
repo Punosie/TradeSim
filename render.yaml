@@ -1,0 +1,31 @@
+# Render Blueprint for the TradeSim FastAPI backend.
+# Secrets (sync: false) are set in the Render dashboard; the Firebase Admin
+# service account is uploaded as the secret file `firebase-adminsdk.json`.
+services:
+  - type: web
+    name: TradeSim
+    runtime: python
+    plan: free
+    repo: https://github.com/Punosie/TradeSim
+    branch: main
+    rootDir: backend
+    autoDeploy: true
+    buildCommand: pip install -r requirements.txt
+    # Single worker: the order book hub is in-process state shared by all clients
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --proxy-headers --forwarded-allow-ips='*'
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.14.5
+      - key: IS_RENDER
+        value: "true"
+      - key: GEMINI_MODEL
+        value: gemini-3.8-flash
+      - key: CORS_ORIGINS
+        value: https://tradesim-shubhabha.vercel.app
+      - key: MONGO_URL
+        sync: false
+      - key: WS_ENDPOINT
+        sync: false
+      - key: GOOGLE_API_KEY
+        sync: false

@@ -18,17 +18,6 @@
   padding: 4px; /* allow breathing room for wrapping */
 }
 
-.ag-theme-material .ag-root {
-  border-radius: 0.75rem; /* rounded-xl equivalent */
-  overflow: hidden;
-}
-
-.ag-theme-material .ag-root-wrapper {
-  border-radius: 0.75rem !important;
-  overflow: hidden;
-}
-
-/* In index.css or App.css */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }

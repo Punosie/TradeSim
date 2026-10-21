@@ -6,65 +6,86 @@ import rehypeHighlight from "rehype-highlight";
 import rehypeKatex from "rehype-katex";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
-import 'katex/dist/katex.min.css'; // 👈 important
+import "katex/dist/katex.min.css";
+import "highlight.js/styles/github-dark.css";
 
+const remarkPlugins = [remarkGfm, remarkMath];
+const rehypePlugins = [rehypeRaw, rehypeHighlight, rehypeKatex];
 
+const markdownComponents = {
+    pre: ({ children }) => (
+        <pre className="rounded-lg text-sm my-2 overflow-x-auto">{children}</pre>
+    ),
+    code({ className, children, ...props }) {
+        // Fenced blocks are highlighted by rehype-highlight; style inline code only
+        if (/language-|hljs/.test(className || "")) {
+            return <code className={className} {...props}>{children}</code>;
+        }
+        return (
+            <code className="bg-gray-800 text-pink-400 px-1 py-0.5 rounded">
+                {children}
+            </code>
+        );
+    },
+    a: ({ href, children }) => (
+        <a
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-400 underline"
+        >
+            {children}
+        </a>
+    ),
+};
+
+const SAVE_DELAY_MS = 500;
+
+const loadMessages = (key) => {
+    try {
+        return JSON.parse(localStorage.getItem(key)) ?? [];
+    } catch {
+        return [];
+    }
+};
+
+const newMessage = (role, text) => ({ id: crypto.randomUUID(), role, text });
 
 const ChatWindow = ({ user }) => {
-    const [messages, setMessages] = useState([]);
-    const [isThinking, setisThinking] = useState(false);
+    const storageKey = `chat_messages_${user.uid}`;
+    const [messages, setMessages] = useState(() => loadMessages(storageKey));
+    const [isThinking, setIsThinking] = useState(false);
     const messagesEndRef = useRef(null);
-    const hasLoadedFromStorage = useRef(false); // prevent overwriting
 
-    const STORAGE_KEY = `chat_messages_${user?.uid}`;
-
-    // Load messages from localStorage
+    // Persist history, debounced so rapid updates write once
     useEffect(() => {
-        if (user && !hasLoadedFromStorage.current) {
-            const savedMessages = localStorage.getItem(STORAGE_KEY);
-            if (savedMessages) {
-                setMessages(JSON.parse(savedMessages));
-            }
-            hasLoadedFromStorage.current = true;
-        }
-    }, [user]);
-
-    // Save to localStorage only after loading
-    useEffect(() => {
-        if (user && hasLoadedFromStorage.current) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
-        }
-    }, [messages, user]);
-
-    const clearHistory = () => {
-        localStorage.removeItem(STORAGE_KEY);
-        setMessages([]);
-    };
-
+        const timer = setTimeout(
+            () => localStorage.setItem(storageKey, JSON.stringify(messages)),
+            SAVE_DELAY_MS
+        );
+        return () => clearTimeout(timer);
+    }, [messages, storageKey]);
 
     // Auto-scroll
     useEffect(() => {
-        if (messagesEndRef.current) {
-            messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-        }
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages, isThinking]);
 
+    const clearHistory = () => {
+        localStorage.removeItem(storageKey);
+        setMessages([]);
+    };
+
     const handleAIResponse = (data) => {
-        setisThinking(false);
-        setMessages((prev) => [
-            ...prev,
-            { role: "ai", text: data?.text || "No response" },
-        ]);
+        setIsThinking(false);
+        if (data) {
+            setMessages((prev) => [...prev, newMessage("ai", data.text || "No response")]);
+        }
     };
 
     const handleUserInput = (input) => {
-        setMessages((prev) => [
-            ...prev,
-            { role: "user", text: input },
-        ]);
-        setisThinking(true);
+        setMessages((prev) => [...prev, newMessage("user", input)]);
+        setIsThinking(true);
     };
 
     return (
@@ -73,50 +94,21 @@ const ChatWindow = ({ user }) => {
             <div className="flex-1 overflow-y-auto sm:px-4 py-2 sm:py-6 space-y-4 flex flex-col no-scrollbar mb-2 md:mb-6">
                 {messages.map((msg, idx) => (
                     <div
-                        key={idx}
+                        key={msg.id ?? idx}
                         className={`px-4 py-3 rounded-2xl max-w-[75%] text-justify text-white text-sm md:text-lg
                             animate-ease-out
                             ${msg.role === "user"
                                 ? "self-end bg-pink-700 rounded-br-none animate-fade-left "
                                 : "self-start bg-slate-700 rounded-bl-none animate-fade-right"
                             }`}
-                        style={{ animationDelay: `${idx * 75}ms` }}
                     >
                         <ReactMarkdown
-                            children={msg.text}
-                            remarkPlugins={[remarkGfm, remarkMath]}
-                            rehypePlugins={[rehypeRaw, rehypeHighlight, rehypeKatex]}
-                            components={{
-                                code({ node, inline, className, children, ...props }) {
-                                    const match = /language-(\w+)/.exec(className || "");
-                                    return !inline && match ? (
-                                        <SyntaxHighlighter
-                                            style={oneDark}
-                                            language={match[1]}
-                                            PreTag="div"
-                                            className="rounded-lg text-sm my-2"
-                                            {...props}
-                                        >
-                                            {String(children).replace(/\n$/, "")}
-                                        </SyntaxHighlighter>
-                                    ) : (
-                                        <code className="bg-gray-800 text-pink-400 px-1 py-0.5 rounded">
-                                            {children}
-                                        </code>
-                                    );
-                                },
-                                a: ({ href, children }) => (
-                                    <a
-                                        href={href}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="text-blue-400 underline"
-                                    >
-                                        {children}
-                                    </a>
-                                )
-                            }}
-                        />
+                            remarkPlugins={remarkPlugins}
+                            rehypePlugins={rehypePlugins}
+                            components={markdownComponents}
+                        >
+                            {msg.text}
+                        </ReactMarkdown>
                     </div>
                 ))}
 
@@ -132,7 +124,7 @@ const ChatWindow = ({ user }) => {
 
             {/* Input Area */}
             <div>
-                <InputForm user={user} onResponse={handleAIResponse} onUserInput={handleUserInput} clearHistory={clearHistory}/>
+                <InputForm onResponse={handleAIResponse} onUserInput={handleUserInput} clearHistory={clearHistory} />
             </div>
         </div>
     );

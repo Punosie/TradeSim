@@ -1,51 +1,57 @@
 "main.py"
 
 import asyncio
-from contextlib import asynccontextmanager
+import logging
+from contextlib import asynccontextmanager, suppress
 
-from app.router.routes import router as app_router
-from app.services.orderbook_manager import shared_orderbook
-from app.utils.firebase_auth import init_firebase
-from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.db import trade_repository
+from fastapi.middleware.gzip import GZipMiddleware
 
-load_dotenv()
+from app.config import CORS_ORIGIN_REGEX, CORS_ORIGINS, LOG_LEVEL, MODEL_PATH
+from app.db import client as mongo_client, trade_repository
+from app.okx_client import OKXClient
+from app.router.routes import router as app_router
+from app.services.orderbook_manager import hub
+from app.services.prediction_model import MidPriceModel
+from app.utils.firebase_auth import init_firebase
+
+logging.basicConfig(level=LOG_LEVEL, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+logger = logging.getLogger("tradesim")
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # This runs on startup
-    task = asyncio.create_task(shared_orderbook.update())
-    
-    trade_repository.init_indexes()  # Ensure indexes are created on startup
-    
-    yield
-    # This runs on shutdown (cancel background task)
-    task.cancel()
+    init_firebase()
+    hub.model = MidPriceModel(MODEL_PATH)
+    feed = asyncio.create_task(hub.run(OKXClient()))
+
     try:
-        await task
-    except asyncio.CancelledError:
-        pass
+        await mongo_client.admin.command("ping")
+        await trade_repository.init_indexes()
+        logger.info("Connected to MongoDB")
+    except Exception as e:
+        # Keep serving live data even if the database is unreachable
+        logger.error("MongoDB connection error: %s", e)
 
-# Initialize Firebase
-init_firebase()
+    yield
 
-app = FastAPI(lifespan=lifespan)
+    feed.cancel()
+    with suppress(asyncio.CancelledError):
+        await feed
+    await mongo_client.close()
 
-origins=[
-    "https://tradesim-shubhabha.vercel.app",
-    "http://localhost:3000",
-    "http://localhost:8000",
-    "http://localhost:5173",
-]
 
+app = FastAPI(title="TradeSim API", lifespan=lifespan)
+
+app.add_middleware(GZipMiddleware, minimum_size=1024)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins= origins,
+    allow_origins=CORS_ORIGINS,
+    allow_origin_regex=CORS_ORIGIN_REGEX or None,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type"],
 )
 
 app.include_router(app_router)

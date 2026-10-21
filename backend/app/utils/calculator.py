@@ -1,31 +1,34 @@
+# (lower bound inclusive, upper bound exclusive, taker fee %)
+FEE_TIERS = (
+    (0, 100_000, 0.1),
+    (100_000, 500_000, 0.05),
+    (500_000, 2_000_000, 0.045),
+    (2_000_000, 5_000_000, 0.04),
+    (5_000_000, 10_000_000, 0.03),
+)
+# Fee for amounts of 10 million and above
+DEFAULT_FEE = 0.025
+
+
 class FeeCalculator:
 
     @staticmethod
     def calculate_fee(amount: float) -> float:
         """
-        Calculate the fee based on the amount and fee percentage.
+        Calculate the taker fee in USD for a trade of `amount` USD.
 
         Args:
-            amount (float): The amount to calculate the fee for.
-            fee_percentage (float): The percentage of the fee to apply.
+            amount (float): The trade value in USD.
 
         Returns:
             float: The calculated fee.
         """
-        tiers = [
-            (1, 100_000, 0.1),
-            (100_000, 500_000, 0.05),
-            (500_000, 2_000_000, 0.045),
-            (2_000_000, 5_000_000, 0.04),
-            (5_000_000, 10_000_000, 0.03),
-        ]
-
-        for lower, upper, taker_fee in tiers:
+        for lower, upper, taker_fee in FEE_TIERS:
             if lower <= amount < upper:
                 return (taker_fee / 100) * amount
-        
-        # Default fee for amounts above 10 million
-        return (0.025 / 100) * amount
+
+        return (DEFAULT_FEE / 100) * amount
+
 
 class SlippageCalculator:
 

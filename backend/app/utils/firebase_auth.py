@@ -1,20 +1,12 @@
-import os
 import firebase_admin
 from firebase_admin import credentials
 
+from app.config import FIREBASE_CREDENTIALS_PATH
+
 
 def init_firebase():
-    if not firebase_admin._apps:
-        base_dir = os.path.dirname(
-            os.path.abspath(__file__)
-        )  # this gives path to `app/utils/`
-        root_dir = os.path.abspath(os.path.join(base_dir, ".."))  # this goes to `app/`
-        if os.getenv("IS_RENDER") == "true":
-            # Running on Render
-            cred_path = "/etc/secrets/firebase-adminsdk.json"
-        else:
-            # Running locally
-            cred_path = os.path.join(root_dir, "firebase-adminsdk.json")
-
-        cred = credentials.Certificate(cred_path)
-        firebase_admin.initialize_app(cred)
+    """Initialise the default Firebase app once."""
+    try:
+        firebase_admin.get_app()
+    except ValueError:
+        firebase_admin.initialize_app(credentials.Certificate(FIREBASE_CREDENTIALS_PATH))

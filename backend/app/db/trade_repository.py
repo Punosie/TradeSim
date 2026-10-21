@@ -1,49 +1,44 @@
-from app.schemas import TradeOutput
-from pymongo.collection import Collection
-from pymongo import IndexModel
 import csv
 import io
 
+from pymongo import IndexModel
+from pymongo.asynchronous.collection import AsyncCollection
+
+from app.schemas import TradeOutput
+
 
 class TradeRepository:
-    def __init__(self, collection: Collection):
+    def __init__(self, collection: AsyncCollection):
         self.collection = collection
 
-    def save_trade(self, trade_output: TradeOutput):
-        """ Save a trade output to the MongoDB collection. """
-        self.collection.insert_one(trade_output.model_dump())
+    async def save_trade(self, trade_output: TradeOutput):
+        """Save a trade output to the MongoDB collection."""
+        await self.collection.insert_one(trade_output.model_dump())
 
-    def init_indexes(self):
-        """
-        Ensure indexes on user_id and timestamp for performance.
-        """
-        indexes = [
-            IndexModel([("user_id", 1)]),
-            IndexModel([("timestamp", -1)])
-        ]
-        self.collection.create_indexes(indexes)
+    async def init_indexes(self):
+        """Ensure the index used by per-user history queries exists."""
+        await self.collection.create_indexes(
+            [IndexModel([("user_id", 1), ("timestamp", -1)])]
+        )
 
-    def get_trades_by_user(self, user_id: str, limit: int = 50):
-        """ Retrieve trades for a specific user, sorted by timestamp. """
-        cursor = self.collection.find({"user_id": user_id}).sort("timestamp", -1).limit(limit)
-        return list(cursor)
+    async def get_trades_by_user(self, user_id: str, limit: int = 0) -> list[dict]:
+        """Retrieve trades for a user, newest first (limit=0 means all)."""
+        cursor = (
+            self.collection.find({"user_id": user_id}, {"_id": 0})
+            .sort("timestamp", -1)
+            .limit(limit)
+        )
+        return await cursor.to_list()
 
-    def get_trades_csv_by_user(self, user_id: str) -> str:
-        """ Retrieve all trades for a specific user and return as CSV string. """
-        cursor = self.collection.find({"user_id": user_id}).sort("timestamp", -1)
-        trades = list(cursor)
-
+    async def get_trades_csv_by_user(self, user_id: str) -> str:
+        """Retrieve all trades for a user as a CSV string ('' when there are none)."""
+        trades = await self.get_trades_by_user(user_id)
         if not trades:
             return ""
-        
-        for trade in trades:
-            trade.pop("_id", None)
 
-        # Convert MongoDB documents to CSV
         output = io.StringIO()
-        output.write('\ufeff')
-        writer = csv.DictWriter(output, fieldnames=trades[0].keys())
+        output.write("﻿")  # BOM so Excel detects UTF-8
+        writer = csv.DictWriter(output, fieldnames=list(TradeOutput.model_fields), extrasaction="ignore")
         writer.writeheader()
         writer.writerows(trades)
-
         return output.getvalue()

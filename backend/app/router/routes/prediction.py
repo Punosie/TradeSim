@@ -1,11 +1,12 @@
-import os
 from fastapi import APIRouter, WebSocket
-from ..handler.prediction_handler import PredictionHandler
+
+from app.services.orderbook_manager import hub
+from ..handler.stream_handler import stream_channel
 
 router = APIRouter()
 
-handler = PredictionHandler("app/regression_models/mid_price_60.pkl")
 
 @router.websocket("/ws/prediction")
 async def midpoint_pred_ws(websocket: WebSocket):
-    await handler.handle_websocket(websocket)
+    """Live 60-second mid-price predictions, sent as {"prediction": [price]}."""
+    await stream_channel(websocket, hub, "prediction")

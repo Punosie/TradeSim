@@ -1,50 +1,31 @@
-import os
-import asyncio
-import websockets
+import logging
+
 import orjson
+import websockets
+
+from app.config import WS_ENDPOINT
+
+logger = logging.getLogger(__name__)
 
 
 class OKXClient:
-    """Client for connecting to the OKX WebSocket API."""
+    """Client for the upstream order book WebSocket feed.
 
-    "class variables"
-    WS_URL = os.getenv("WS_ENDPOINT")
-    DATA_PATH = "./dataSample/sample.json"
-    PING_INTERVAL = 20  # seconds
+    Holds no per-connection state, so it is safe to reuse; keepalive pings are
+    handled by the websockets library.
+    """
 
-    def __init__(self):
-        os.makedirs(os.path.dirname(self.DATA_PATH), exist_ok=True)
-        self.websocket = None
-        self.ping_task = None
-        self.connected = False
-
-    async def start_ping(self):
-        """Continuously sends ping messages to keep the WebSocket alive."""
-        try:
-            while self.connected:
-                await self.websocket.ping()
-                await asyncio.sleep(self.PING_INTERVAL)
-        except asyncio.CancelledError:
-            pass
-        except Exception as e:
-            print(f"[Ping Error] {e}")
-            self.connected = False
+    def __init__(self, url: str = WS_ENDPOINT, ping_interval: float = 20):
+        if not url:
+            raise RuntimeError("WS_ENDPOINT is not configured")
+        self.url = url
+        self.ping_interval = ping_interval
 
     async def subscribe(self):
-        """Connects to the WebSocket and yields incoming messages."""
-        async with websockets.connect(self.WS_URL, ping_interval=None) as websocket:
-            self.websocket = websocket
-            self.connected = True
-            self.ping_task = asyncio.create_task(self.start_ping())
-
-            try:
-                async for message in websocket:
-                    data = orjson.loads(message)
-                    yield data
-            finally:
-                self.ping_task.cancel()
-                try:
-                    await self.ping_task
-                except asyncio.CancelledError:
-                    pass
-                self.connected = False
+        """Connect to the feed and yield each decoded message."""
+        async with websockets.connect(
+            self.url, ping_interval=self.ping_interval, max_size=None
+        ) as websocket:
+            logger.info("Connected to upstream order book feed")
+            async for message in websocket:
+                yield orjson.loads(message)

@@ -7,7 +7,7 @@ const AIChat = () => {
     if (loading) {
         return (
             <div className="text-sm md:text-lg rounded-xl p-6 shadow-md w-full mx-auto mt-6 animate-in fade-in zoom-in duration-700">
-                <p className="text-white text-center text-md xl:text-xl">Loading...</p>
+                <p className="text-white text-center text-base xl:text-xl">Loading...</p>
             </div>
         );
     }
@@ -15,7 +15,7 @@ const AIChat = () => {
     if (!user) {
         return (
             <div className="bg-slate-800 text-sm md:text-lg rounded-xl p-6 shadow-md w-full mx-auto mt-6 animate-in fade-in slide-in-from-top duration-700">
-                <p className="text-red-500 text-center text-md xl:text-xl">
+                <p className="text-red-500 text-center text-base xl:text-xl">
                     Please log in to use the AI assistant.
                 </p>
             </div>
@@ -28,7 +28,7 @@ const AIChat = () => {
                 AI <span className="text-pink-600">Assistant</span>
             </h1>
             <div className="w-full">
-                <ChatWindow user={user} />
+                <ChatWindow key={user.uid} user={user} />
             </div>
         </div>
     );

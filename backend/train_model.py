@@ -1,220 +1,99 @@
-# import orjson
-# from datetime import datetime, timedelta
-# from sklearn.ensemble import GradientBoostingRegressor
-# from sklearn.linear_model import LinearRegression
-# from sklearn.model_selection import train_test_split
-# import numpy as np
-# import joblib
-# import os
+"""Train the 60-second mid-price model from recorded order book snapshots.
 
-# PATH = "./dataSample/training_data.json"
-# MODEL_PATH = "./models"
-# LR_MODEL_FILE = "linear_regression_model.pkl"
-# PREDICT_HORIZON = timedelta(minutes=5)
+Usage (from backend/):
+    python train_model.py            # train and save app/regression_models/mid_price_60.pkl
+    python train_model.py --plot     # also plot predicted vs actual (needs requirements-dev.txt)
+"""
 
-# os.makedirs(MODEL_PATH, exist_ok=True)
-
-# #Load data
-# with open(PATH, "rb") as f:
-#     snpashots = [orjson.loads(line.strip()) for line in f.readlines()]
-
-# x = [] #features (best ask, best bid, spread)
-# y = [] #target variable (mid price)
-
-# for snapshot in snpashots:
-#     if "asks" in snapshot and "bids" in snapshot:
-#         best_ask = float(snapshot["asks"][0][0])
-#         best_bid = float(snapshot["bids"][0][0])
-#         spread = best_ask - best_bid
-#         mid_price = (best_ask + best_bid) / 2
-#         ask_vol = sum(float(q) for _, q in snapshot["asks"])
-#         bid_vol = sum(float(q) for _, q in snapshot["bids"])
-#         features = [best_ask, best_bid, spread, ask_vol, bid_vol]
-#         x.append(features)
-#         y.append(mid_price)
-
-# # Convert to numpy arrays
-# x = np.array(x)
-# y = np.array(y)
-
-# # Split the data into training and testing sets
-# x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
-
-# # Train the model
-# model = LinearRegression()
-# model.fit(x_train, y_train)
-# # Evaluate the model
-# score = model.score(x_test, y_test)
-# print(f"Model score: {score:.4f}")
-# # Save the model
-# model_file_path = os.path.join(MODEL_PATH, LR_MODEL_FILE)
-# joblib.dump(model, model_file_path)
-# print(f"Model saved to {model_file_path}")
-
-# import matplotlib.pyplot as plt
-
-# # Predict on test data
-# y_pred = model.predict(x_test)
-
-# # Plot: Predicted vs Actual (Scatter)
-# plt.figure(figsize=(8, 6))
-# plt.scatter(y_test, y_pred, alpha=0.5, color="blue")
-# plt.plot([min(y_test), max(y_test)], [min(y_test), max(y_test)], 'r--')  # Diagonal line
-# plt.xlabel("Actual Mid Price")
-# plt.ylabel("Predicted Mid Price")
-# plt.title("Linear Regression: Actual vs Predicted Mid Prices")
-# plt.grid(True)
-# plt.show()
-
-# # Optional: Line plot if you want to see sequences
-# plt.figure(figsize=(10, 4))
-# plt.plot(y_test[:100], label="Actual", linewidth=2)
-# plt.plot(y_pred[:100], label="Predicted", linewidth=2, linestyle='dashed')
-# plt.title("Mid Price Prediction (First 100 Test Samples)")
-# plt.xlabel("Snapshot Index")
-# plt.ylabel("Mid Price")
-# plt.legend()
-# plt.grid(True)
-# plt.show()
-
-
-import orjson
+import argparse
+import bisect
 from datetime import datetime, timedelta
-from sklearn.linear_model import LinearRegression
+from pathlib import Path
+
+import joblib
+import numpy as np
+import orjson
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.model_selection import train_test_split
-import numpy as np
-import joblib
-import os
-import bisect
-import matplotlib.pyplot as plt
 
-# Configuration
-PATH = "./dataSample/training_data.json"
-MODEL_PATH = "./models"
-LR_MODEL_FILE = "linear_regression_model_5s_timestamp.pkl"
+from app.utils.feature_extractor import FeatureExtractor
+
+BASE_DIR = Path(__file__).resolve().parent
+DATA_PATH = BASE_DIR / "dataSample" / "training_data.json"
+MODEL_FILE = BASE_DIR / "app" / "regression_models" / "mid_price_60.pkl"
 PREDICT_HORIZON = timedelta(seconds=60)
-
-os.makedirs(MODEL_PATH, exist_ok=True)
-
-# Load and sort snapshots by timestamp
-with open(PATH, "rb") as f:
-    snapshots = [orjson.loads(line.strip()) for line in f.readlines()]
+TOLERANCE_S = 0.5
 
 
-# convert timestamp to datetime and sort
-
-for snap in snapshots:
-    snap["parsed_ts"] = datetime.fromisoformat(
-        snap["timestamp"].replace("Z", "+00:00"))
-# Sort snapshots by parsed timestamp
-snapshots.sort(key=lambda x: x["parsed_ts"])
-
-
-# map timestamps to parsed timestamps for faster lookup
-timestamp_map = {}
-for snap in snapshots:
-    timestamp_map[snap["parsed_ts"]] = snap
-
-all_timestamps = sorted(timestamp_map.keys())
+def load_snapshots(path: Path) -> list[dict]:
+    """Load newline-delimited JSON snapshots, sorted by timestamp."""
+    with open(path, "rb") as f:
+        snapshots = [orjson.loads(line) for line in f if line.strip()]
+    for snap in snapshots:
+        snap["parsed_ts"] = datetime.fromisoformat(snap["timestamp"].replace("Z", "+00:00"))
+    snapshots.sort(key=lambda s: s["parsed_ts"])
+    return snapshots
 
 
-# select snapshot pairs with a 5-second difference
-# BINARY SEARCH
+def build_dataset(snapshots: list[dict]) -> tuple[np.ndarray, np.ndarray]:
+    """Pair each snapshot with the one PREDICT_HORIZON later.
 
-X = []  # features (best ask, best bid, spread)
-Y = []  # target variable (mid price)
-
-for i in range(len(all_timestamps)):
-    t = all_timestamps[i]
-    t_future = t + PREDICT_HORIZON
-
-    j = bisect.bisect_left(all_timestamps, t_future)
-
-    if j < len(all_timestamps) and abs((all_timestamps[j] - t_future).total_seconds()) <= 0.5:
-        # Found a matching future timestamp
-
-        snap_curr = timestamp_map[t]
-        snap_future = timestamp_map[all_timestamps[j]]
-
-        # Extract features and target variable
-        if "asks" in snap_curr and "bids" in snap_curr:
-            best_ask = float(snap_curr["asks"][0][0])
-            best_bid = float(snap_curr["bids"][0][0])
-            spread = best_ask - best_bid
-            mid_price_curr = (best_ask + best_bid) / 2
-            ask_vol = sum(float(q) for _, q in snap_curr["asks"])
-            bid_vol = sum(float(q) for _, q in snap_curr["bids"])
-            imbalance = (bid_vol - ask_vol) / (bid_vol + ask_vol + 1e-9)
-
-            # Add top 5 prices
-            top_5_ask_prices = [float(price)
-                                for price, _ in snap_curr["asks"][:5]]
-            top_5_bid_prices = [float(price)
-                                for price, _ in snap_curr["bids"][:5]]
-            while len(top_5_ask_prices) < 5:
-                top_5_ask_prices.append(best_ask)
-            while len(top_5_bid_prices) < 5:
-                top_5_bid_prices.append(best_bid)
-
-            features = [
-                best_ask, best_bid, spread, mid_price_curr,
-                ask_vol, bid_vol, imbalance
-            ] + top_5_ask_prices + top_5_bid_prices
-
-            mid_price_future = (
-                float(snap_future["asks"][0][0]) + float(snap_future["bids"][0][0]))/2
-
-        else:
+    The target is the relative mid-price change in basis points, which keeps the
+    model independent of the absolute price level seen in the training window.
+    """
+    timestamps = [s["parsed_ts"] for s in snapshots]
+    X, Y = [], []
+    for snap in snapshots:
+        if not snap.get("asks") or not snap.get("bids"):
             continue
-        
-        X.append(features)
-        Y.append(mid_price_future)
-    
+        t_future = snap["parsed_ts"] + PREDICT_HORIZON
+        j = bisect.bisect_left(timestamps, t_future)
+        if j >= len(timestamps) or abs((timestamps[j] - t_future).total_seconds()) > TOLERANCE_S:
+            continue
+        future = snapshots[j]
+        if not future.get("asks") or not future.get("bids"):
+            continue
 
-# Convert to numpy arrays
-X = np.array(X)
-Y = np.array(Y)
+        mid_now = FeatureExtractor.mid_price(snap["bids"], snap["asks"])
+        mid_future = FeatureExtractor.mid_price(future["bids"], future["asks"])
+        X.append(FeatureExtractor.extract_features(snap["bids"], snap["asks"]))
+        Y.append((mid_future - mid_now) / mid_now * 1e4)
+    return np.array(X), np.array(Y)
 
-# Split the data into training and testing sets
-x_train, x_test, y_train, y_test = train_test_split(
-    X, Y, test_size=0.2, random_state=57)
 
-# Train the model
-# model = LinearRegression()
-model = GradientBoostingRegressor( n_estimators=200, learning_rate=0.1, max_depth=5, random_state=57)
-model.fit(x_train, y_train)
+def plot(y_test: np.ndarray, y_pred: np.ndarray):
+    import matplotlib.pyplot as plt
 
-# Evaluate the model
-score = model.score(x_test, y_test)
-print(f"Model score: {score:.4f}")
+    plt.figure(figsize=(8, 6))
+    plt.scatter(y_test, y_pred, alpha=0.5, color="blue")
+    plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], "r--")
+    plt.xlabel("Actual change (bps)")
+    plt.ylabel("Predicted change (bps)")
+    plt.title("Actual vs Predicted 60s Mid-Price Change (bps)")
+    plt.grid(True)
+    plt.show()
 
-# Save the model
-model_file_path = os.path.join(MODEL_PATH, LR_MODEL_FILE)
-joblib.dump(model, model_file_path)
-print(f"Model saved to {model_file_path}")
 
-# Predict on test data
-y_pred = model.predict(x_test)
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--plot", action="store_true", help="plot predicted vs actual")
+    args = parser.parse_args()
 
-# Plot: Predicted vs Actual (Scatter)
-plt.figure(figsize=(8, 6))
-plt.scatter(y_test, y_pred, alpha=0.5, color="blue")
-plt.plot([min(y_test), max(y_test)], [
-         min(y_test), max(y_test)], 'r--')  # Diagonal line
-plt.xlabel("Actual Mid Price")
-plt.ylabel("Predicted Mid Price")
-plt.title("Linear Regression: Actual vs Predicted Mid Prices")
-plt.grid(True)
-plt.show()
+    X, Y = build_dataset(load_snapshots(DATA_PATH))
+    print(f"Training samples: {len(X)}")
 
-# Line plot if you want to see sequences
-plt.figure(figsize=(10, 4))
-plt.plot(y_test, label="Actual", linewidth=2)
-plt.plot(y_pred, label="Predicted", linewidth=2, linestyle='dashed')
-plt.title("Mid Price Prediction")
-plt.xlabel("Snapshot Index")
-plt.ylabel("Mid Price")
-plt.legend()
-plt.grid(True)
-plt.show()
+    x_train, x_test, y_train, y_test = train_test_split(X, Y, test_size=0.2, random_state=57)
+    model = GradientBoostingRegressor(n_estimators=200, learning_rate=0.1, max_depth=5, random_state=57)
+    model.fit(x_train, y_train)
+    print(f"Model R^2 score: {model.score(x_test, y_test):.4f}")
+
+    MODEL_FILE.parent.mkdir(parents=True, exist_ok=True)
+    joblib.dump(model, MODEL_FILE)
+    print(f"Model saved to {MODEL_FILE}")
+
+    if args.plot:
+        plot(y_test, model.predict(x_test))
+
+
+if __name__ == "__main__":
+    main()

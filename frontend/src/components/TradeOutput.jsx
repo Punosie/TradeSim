@@ -1,14 +1,26 @@
-import axios from "axios";
+import { useState } from "react";
 import useAuth from "../hooks/useAuthHook";
-const API_URL = import.meta.env.VITE_API_URL;
+import api from "../lib/api";
+
+const RESULT_FIELDS = [
+    "exchange",
+    "asset",
+    "order_type",
+    "qty_usd",
+    "side",
+    "filled_qty",
+    "average_price",
+    "total_value",
+];
 
 const TradeOutput = ({ result }) => {
     const { user, loading } = useAuth();
+    const [downloadError, setDownloadError] = useState("");
 
     if (loading) {
         return (
             <div className="text-sm md:text-lg rounded-xl p-6 shadow-md w-full mx-auto mt-6">
-                <p className="text-white text-center text-md xl:text-xl">Loading...</p>
+                <p className="text-white text-center text-base xl:text-xl">Loading...</p>
             </div>
         );
     }
@@ -16,7 +28,7 @@ const TradeOutput = ({ result }) => {
     if (!user) {
         return (
             <div className="bg-slate-800 text-sm md:text-lg rounded-xl p-6 shadow-md w-full mx-auto mt-6">
-                <p className="text-red-500 text-sm md:text-md xl:text-xl text-center">
+                <p className="text-red-500 text-sm md:text-base xl:text-xl text-center">
                     Please log in to submit a trade and view the output.
                 </p>
             </div>
@@ -26,18 +38,11 @@ const TradeOutput = ({ result }) => {
     const isSubmitDisabled = !user;
 
     const handleclick = async () => {
+        setDownloadError("");
         try {
-            console.log("Downloading trade history...");
-            const IDToken = await user.getIdToken();
+            const response = await api.get("/trade-history", { responseType: "blob" });
 
-            const response = await axios.get(`${API_URL}/trade-history`, {
-                headers: {
-                    Authorization: `Bearer ${IDToken}`,
-                },
-                responseType: "blob",
-            });
-
-            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const url = window.URL.createObjectURL(response.data);
             const a = document.createElement("a");
             a.href = url;
             a.download = "trade_history.csv";
@@ -46,8 +51,11 @@ const TradeOutput = ({ result }) => {
             a.remove();
             window.URL.revokeObjectURL(url);
         } catch (err) {
-            console.error("Error downloading trades:", err);
-            alert("Failed to download trade history.");
+            setDownloadError(
+                err?.response?.status === 404
+                    ? "No trades yet. Submit a trade first."
+                    : "Failed to download trade history."
+            );
         }
     };
 
@@ -70,6 +78,10 @@ const TradeOutput = ({ result }) => {
                         </p>
                     </>
 
+                ) : result.error ? (
+                    <p className="text-rose-400 font-semibold text-center text-xs md:text-sm xl:text-lg">
+                        {result.error}
+                    </p>
                 ) : (
                     <>
                         <h2
@@ -79,16 +91,7 @@ const TradeOutput = ({ result }) => {
                             {result.status === 'success' ? 'Trade Successful' : 'Trade Failed'}
                         </h2>
                         <div className="grid gap-y-2 bg text-xs md:text-sm xl:text-lg">
-                            {[
-                                "exchange",
-                                "asset",
-                                "order_type",
-                                "qty_usd",
-                                "side",
-                                "filled_qty",
-                                "average_price",
-                                "total_value",
-                            ].map((key) => (
+                            {RESULT_FIELDS.map((key) => (
                                 <div
                                     className="grid grid-cols-2 border-b border-slate-700 pb-1"
                                     key={key}
@@ -109,10 +112,13 @@ const TradeOutput = ({ result }) => {
                     </>
                 )}
             </div>
+            {downloadError && (
+                <p className="text-rose-400 text-xs md:text-sm text-center mt-2">{downloadError}</p>
+            )}
             <button
-                type="submit"
+                type="button"
                 onClick={handleclick}
-                className={`m-2 md:mt-6 w-full p-1.5 md:p-2 border text-xs sm:text-sm md:text-md xl:text-lg rounded-md transition duration-300 ${(isSubmitDisabled)
+                className={`m-2 md:mt-6 w-full p-1.5 md:p-2 border text-xs sm:text-sm md:text-base xl:text-lg rounded-md transition duration-300 ${(isSubmitDisabled)
                     ? 'border-slate-500 text-slate-400 cursor-not-allowed'
                     : 'border-emerald-500 text-white hover:bg-emerald-600'
                     }`}

@@ -1,38 +1,31 @@
+from fastapi import HTTPException
+
 from app.db import trade_repository
 from app.schemas import TradeInput, TradeOutput
-from app.config import TRADE_LOG_PATH
-from app.services.orderbook_manager import shared_orderbook
+from app.services.orderbook_manager import OrderbookHub
 from app.services.simulation_service import SimulateMarketOrder
 
 
 class TradeHandler:
     """Service for handling trade simulations."""
 
-    PATH = TRADE_LOG_PATH
+    def __init__(self, orderbook: OrderbookHub):
+        self.orderbook = orderbook
 
-    def __init__(self):
-        """Initialize the TradeHandler with a shared orderbook and simulator."""
-        self.orderbook = shared_orderbook
-        self.simulator = SimulateMarketOrder()
+    async def simulate_trade(self, trade_input: TradeInput, user_id: str) -> dict:
+        """Simulate a market order against the latest order book and persist it."""
+        if not self.orderbook.ready:
+            raise HTTPException(
+                status_code=503,
+                detail="Order book not available yet. Please retry in a few seconds.",
+            )
 
-    async def simulate_trade(self, trade_input: TradeInput, user_id: str):
-        """Simulate a trade based on the input data."""
-
-        if self.orderbook is None:
-            return {
-                "error": "Orderbook not available. Please wait for the WebSocket connection to establish."
-            }
-
+        side = trade_input.side
+        book = self.orderbook.get_asks() if side == "buy" else self.orderbook.get_bids()
         try:
-            if trade_input.qty_usd <= 0:
-                raise ValueError("Quantity in USD must be greater than 0.")
-
-            side = trade_input.side.lower()
-            result = self.simulator.execute(side, trade_input.qty_usd)
-
-        except Exception as e:
-            return {"error": str(e)}
-
+            result = SimulateMarketOrder.execute(book, side, trade_input.qty_usd)
+        except ValueError as e:
+            raise HTTPException(status_code=422, detail=str(e))
 
         trade_log = TradeOutput(
             user_id=user_id,
@@ -41,25 +34,20 @@ class TradeHandler:
             asset=self.orderbook.get_symbol(),
             order_type=self.orderbook.get_order_type(),
             qty_usd=trade_input.qty_usd,
-            side = trade_input.side,
-            filled_qty=result.get("filled_qty", 0),
-            fee_usd=result.get("fee_usd", 0),
-            slippage=result.get("slippage_percent", 5.0),
-            average_price=result.get("average_price", 0),
-            total_value=result.get("total_value", 0),
-            latency=result.get("latency", "N/A"),
-            status="success" if result.get("filled_qty", 0) > 0 else "failed",
+            side=side,
+            filled_qty=result["filled_qty"],
+            fee_usd=result["fee_usd"],
+            slippage=result["slippage_percent"],
+            average_price=result["average_price"],
+            total_value=result["total_value"],
+            latency=result["latency"],
+            status="success" if result["filled_qty"] > 0 else "failed",
         )
 
-        trade_repository.save_trade(trade_log)
+        await trade_repository.save_trade(trade_log)
 
         return trade_log.model_dump()
 
-    def get_trade_history_csv(self, user_id: str) -> str:
-        """Retrieve the trade history for a specific user and return as a CSV string."""
-        csv_data = trade_repository.get_trades_csv_by_user(user_id)
-
-        if not csv_data:
-            return "NO TRADES YET"
-
-        return csv_data
+    async def get_trade_history_csv(self, user_id: str) -> str:
+        """Return the user's trade history as CSV ('' when there are no trades)."""
+        return await trade_repository.get_trades_csv_by_user(user_id)

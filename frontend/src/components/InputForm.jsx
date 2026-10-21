@@ -1,12 +1,11 @@
 import { useState, useRef, useEffect } from "react";
-import axios from "axios";
 import { IoSend } from "react-icons/io5";
 import { FiTrash2 } from "react-icons/fi";
+import api, { errorMessage } from "../lib/api";
 
-const API_URL = import.meta.env.VITE_API_URL;
 const COOLDOWN_MS = 3000; // 3 seconds
 
-const InputForm = ({ user, model = "gemini-2.0-flash", onResponse, onUserInput, clearHistory }) => {
+const InputForm = ({ onResponse, onUserInput, clearHistory }) => {
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -41,19 +40,11 @@ const InputForm = ({ user, model = "gemini-2.0-flash", onResponse, onUserInput, 
         onUserInput?.(prompt);
 
         try {
-            const IDToken = await user.getIdToken();
-            const payload = { model, prompt };
-
-            const response = await axios.post(`${API_URL}/ask-ai`, payload, {
-                headers: {
-                    Authorization: `Bearer ${IDToken}`,
-                },
-            });
-
+            const response = await api.post("/ask-ai", { prompt });
             onResponse?.(response.data);
         } catch (err) {
-            console.error("Error:", err);
-            setError("Something went wrong!");
+            setError(errorMessage(err));
+            onResponse?.(null);
         } finally {
             setLoading(false);
         }

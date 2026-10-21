@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router";
 import { FaBitcoinSign } from "react-icons/fa6";
 import { HiMenu, HiX } from "react-icons/hi";
 import useAuth from "../hooks/useAuthHook";
@@ -31,7 +31,7 @@ const Navbar = () => {
       <nav className="w-full max-w-full px-6 flex items-center justify-between">
         {/* Logo */}
         <NavLink to="/" className="flex items-center text-slate-100 font-bold text-lg md:text-2xl tracking-wider">
-          <FaBitcoinSign className="text-lg sm:text:xl lg:text-2xl xl:text-4xl" />
+          <FaBitcoinSign className="text-lg sm:text-xl lg:text-2xl xl:text-4xl" />
           <span className="pl-1 sm:pl-2">
             Trade<span className="text-pink-500">Sim</span>
           </span>
@@ -39,24 +39,24 @@ const Navbar = () => {
 
         {/* Desktop Navigation */}
         <div className="w-full ml-auto flex justify-end py-4">
-          <div className="hidden md:flex items-center space-x-6 text-sm sm:text-md lg:text-lg">
+          <div className="hidden md:flex items-center space-x-6 text-sm sm:text-base lg:text-lg">
             <NavLink to="/" className={({ isActive }) =>
-              `flex items-center justify-center h-10 px-4 text-sm sm:text-md lg:text-lg transition-transform hover:scale-105 ${isActive ? "text-pink-500 font-semibold" : "text-slate-300 hover:text-pink-500"
+              `flex items-center justify-center h-10 px-4 text-sm sm:text-base lg:text-lg transition-transform hover:scale-105 ${isActive ? "text-pink-500 font-semibold" : "text-slate-300 hover:text-pink-500"
               }`}>
               Home
             </NavLink>
             <NavLink to="/sim" className={({ isActive }) =>
-              `flex items-center justify-center h-10 px-4 text-sm sm:text-md lg:text-lg transition-transform hover:scale-105 ${isActive ? "text-pink-500 font-semibold" : "text-slate-300 hover:text-pink-500"
+              `flex items-center justify-center h-10 px-4 text-sm sm:text-base lg:text-lg transition-transform hover:scale-105 ${isActive ? "text-pink-500 font-semibold" : "text-slate-300 hover:text-pink-500"
               }`}>
               Simulator
             </NavLink>
             <NavLink to="/ask-ai" className={({ isActive }) =>
-              `flex items-center justify-center h-10 px-4 text-sm sm:text-md lg:text-lg transition-transform hover:scale-105 ${isActive ? "text-pink-500 font-semibold" : "text-slate-300 hover:text-pink-500"
+              `flex items-center justify-center h-10 px-4 text-sm sm:text-base lg:text-lg transition-transform hover:scale-105 ${isActive ? "text-pink-500 font-semibold" : "text-slate-300 hover:text-pink-500"
               }`}>
               Ask AI
             </NavLink>
             <NavLink to="/about" className={({ isActive }) =>
-              `flex items-center justify-center h-10 px-4 text-sm sm:text-md lg:text-lg transition-transform hover:scale-105 ${isActive ? "text-pink-500 font-semibold" : "text-slate-300 hover:text-pink-500"
+              `flex items-center justify-center h-10 px-4 text-sm sm:text-base lg:text-lg transition-transform hover:scale-105 ${isActive ? "text-pink-500 font-semibold" : "text-slate-300 hover:text-pink-500"
               }`}>
               About
             </NavLink>
@@ -69,7 +69,7 @@ const Navbar = () => {
               Docs
             </a>
             <NavLink to="/contact" className={({ isActive }) =>
-              `flex items-center justify-center h-10 px-4 text-sm sm:text-md lg:text-lg transition-transform hover:scale-105 ${isActive ? "text-pink-500 font-semibold" : "text-slate-300 hover:text-pink-500"
+              `flex items-center justify-center h-10 px-4 text-sm sm:text-base lg:text-lg transition-transform hover:scale-105 ${isActive ? "text-pink-500 font-semibold" : "text-slate-300 hover:text-pink-500"
               }`}>
               Contact
             </NavLink>
@@ -97,7 +97,7 @@ const Navbar = () => {
             )}
             {loginDialogOpen && (
               <div className="absolute top-14 right-0 z-50" ref={loginRef}>
-                <LoginDialog ref={loginRef} closeDialog={() => setLoginDialogOpen(false)} />
+                <LoginDialog closeDialog={() => setLoginDialogOpen(false)} />
               </div>
             )}
           </div>

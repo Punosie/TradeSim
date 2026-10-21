@@ -5,12 +5,13 @@ import TradeOutput from "../components/TradeOutput";
 import OrderBook from "../components/OrderBook";
 import Prediction from "../components/Prediction";
 import { useState } from 'react';
+import Seo from '../components/Seo';
 
 const Simulator = () => {
     const [response, setResponse] = useState(null)
     return (
         <div className="relative min-h-screen overflow-clip flex flex-col justify-between">
-            <title>Simulator | TradeSim</title>
+            <Seo title="Simulator" path="/sim" description="Live BTC-USDT order book, market order simulation with fees and slippage, and a real-time 60-second mid-price prediction." />
             {/* Background gradients */}
             <div className="absolute inset-0 bg-gray-950">
                 {/* Right-side blob */}
@@ -43,17 +44,17 @@ const Simulator = () => {
                             <OrderBook />
                         </div>
                     </div>
-                    <div className="animate-fade-up animate-duration-[1000ms] animate-delay-150 animate-ease-out flex flex-wrap h-full gap:2 md:gap-8 justify-around " >
+                    <div className="animate-fade-up animate-duration-[1000ms] animate-delay-150 animate-ease-out flex flex-wrap h-full gap-2 md:gap-8 justify-around " >
                         <div className="flex-1 min-w-[315px] max-w-[450px] border rounded-md p-4 border-transparent" >
-                            <span className=" text-slate-100 text-shadow-sm text-sm md:text-md xl:text-xl text-center mb-4 p-2 block tracking-wide font-bold">TRADE CONFIGURATION</span>
+                            <span className=" text-slate-100 text-shadow-sm text-sm md:text-base xl:text-xl text-center mb-4 p-2 block tracking-wide font-bold">TRADE CONFIGURATION</span>
                             <TradeForm onSubmitResponse={setResponse} />
                         </div>
                         <div className="flex-1 min-w-[315px] max-w-[450px] border rounded-md p-4 border-transparent" >
-                            <span className="text-slate-100 text-sm md:text-md xl:text-xl text-center mb-4 p-2 block tracking-wide font-bold">PREDICTION METRICS</span>
+                            <span className="text-slate-100 text-sm md:text-base xl:text-xl text-center mb-4 p-2 block tracking-wide font-bold">PREDICTION METRICS</span>
                             <Prediction />
                         </div>
                         <div className="flex-1 min-w-[315px] max-w-[450px] border rounded-md p-4 border-transparent" >
-                            <span className="text-slate-100 text-sm md:text-md xl:text-xl text-center mb-4 p-2 block tracking-wide font-bold">TRADE OUTPUT</span>
+                            <span className="text-slate-100 text-sm md:text-base xl:text-xl text-center mb-4 p-2 block tracking-wide font-bold">TRADE OUTPUT</span>
                             <TradeOutput result={response} />
                         </div>
                     </div>
