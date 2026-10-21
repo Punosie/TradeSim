@@ -14,7 +14,7 @@ The backend of TradeSim is developed using:
   Serves REST and WebSocket endpoints for trade simulation, orderbook updates, and prediction metrics.
 
 - 🧠 **Machine Learning Model**  
-  A trained scikit-learn model predicts the midpoint price 60 seconds into the future using real-time orderbook data.
+  A trained scikit-learn model predicts the mid-price 60 seconds ahead from scale-free order book features.
 
 - ⚙️ **Trade Simulation Engine**  
   Processes incoming market order requests, simulates fills based on current orderbook state, and returns detailed trade execution metrics.
@@ -29,6 +29,9 @@ The backend of TradeSim is developed using:
 | Web Framework        | FastAPI          | Async framework for HTTP and WebSocket APIs |
 | Machine Learning     | scikit-learn     | Model training and inference for predictions|
 | WebSockets           | FastAPI WebSocket | Real-time data push to frontend             |
+| Database             | MongoDB (async PyMongo) | Stores simulated trades per user      |
+| Auth                 | Firebase Admin SDK | Verifies user ID tokens                   |
+| AI Assistant         | Google Gemini    | Answers trading questions                   |
 | Market Data Provider | OKX API (external) | Source of live orderbook snapshots         |
 
 ---

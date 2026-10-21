@@ -15,49 +15,55 @@ The backend of TradeSim is built to stream real-time market data, simulate trade
 
 ## Architectural Overview
 
-### 1. **Real-Time Data Routing**
+### 1. **Single Upstream Feed, Fan-Out to Clients**
 
-- The backend connects to the **OKX WebSocket API** to receive live orderbook data.
-- This data is then:
-  - Published to a WebSocket endpoint: `/ws/okx` (for frontend visualization)
-  - Forwarded to the **prediction module** via internal WebSocket or async message queue
+- On startup the backend opens **one** WebSocket connection to the upstream OKX order book feed. If the connection drops, it reconnects with exponential backoff.
+- An in-process **`OrderbookHub`** (`app/services/orderbook_manager.py`) keeps the latest snapshot and publishes every tick to subscribed clients.
+- Each browser connection on `/ws/okx` or `/ws/prediction` gets its own small bounded queue. A slow client drops its oldest message instead of slowing everyone else down.
 
 ### 2. **Prediction Pipeline**
 
-- The **prediction service** listens for incoming orderbook snapshots via WebSocket.
-- It runs a scikit-learn ML model on each snapshot to forecast the midpoint  60 seconds into pricethe future.
-- Predictions are streamed to the frontend via the `/ws/prediction` WebSocket endpoint.
+- A scikit-learn `GradientBoostingRegressor` predicts the **relative change** of the mid-price 60 seconds ahead, in basis points.
+- Its features are scale-free: spread and top-of-book offsets measured relative to the mid-price, plus volume imbalance. The model therefore keeps working when BTC trades far from the price level seen in training.
+- The predicted change is applied to the current mid-price, **computed once per tick** and broadcast on `/ws/prediction`.
+- Retrain with `python train_model.py` (add `--plot` to plot the results, which needs `requirements-dev.txt`).
 
 ### 3. **Trade Simulation Engine**
 
-- Stateless simulation using the current orderbook data supplied with each request.
-- Computes:
-  - Simulated market order fill
-  - Execution metrics like slippage, latency, etc.
-- Available at the REST endpoint: `POST /simulate/trade`
+- `POST /simulate/trade` walks the live order book (asks for buys, bids for sells) to fill the requested USD amount.
+- Computes the fill quantity, average price, tiered taker fee, slippage and latency.
+- Each simulated trade is stored in **MongoDB**, written through the async `pymongo` client. Users can download their history as CSV.
 
-### 4. **High-Performance JSON Handling**
+### 4. **Auth and AI**
 
-To ensure minimal latency in message encoding/decoding:
+- REST endpoints verify **Firebase ID tokens** with the Firebase Admin SDK. Verification runs in a thread pool, so it never blocks the event loop.
+- `POST /ask-ai` uses the async Google Gen AI client with a server-configured Gemini model.
 
-- **`orjson`** is used for fast serialization and deserialization of JSON data in both WebSocket and REST pipelines.
-- This significantly reduces the overhead of handling high-frequency market data and responses.
+### 5. **High-Performance JSON Handling**
 
-### 5. **Data Flow Overview**
+- **`orjson`** decodes the upstream feed. Each tick is serialized **once** and the same payload is sent to every client.
+
+### 6. **Data Flow Overview**
 
 ```plaintext
-              [OKX WebSocket API]
-                       ↓
-          [Backend Data Relay Service]
-               ↙              ↘
-     [/ws/okx]          [Prediction Module]
-                                ↓
-                        [/ws/prediction]
-
+            [OKX order book feed]
+                     │  (one connection)
+                     ▼
+              [OrderbookHub]
+          ┌──────────┼──────────────┐
+          ▼          ▼              ▼
+  latest snapshot  per-tick      [ML model]
+          │        broadcast         │
+          ▼          ▼               ▼
+ POST /simulate   /ws/okx      /ws/prediction
+     /trade      (N clients)    (N clients)
+          │
+          ▼
+      [MongoDB]
 ```
 
 ## Design Characteristics
 
-- **Stateless:** No long-term state is stored on the backend — all logic is driven by live or request-time data.
-- **Modular:** Prediction and simulation are separated logically and can scale independently.
-- **High-Performance:** Fully async stack, fast JSON parsing (orjson), and WebSocket-first design allow real-time responsiveness.
+- **Single process, single worker:** the hub is in-process state, so the service runs one Uvicorn worker.
+- **Async throughout:** Mongo, Gemini and token verification never block the event loop.
+- **Configurable:** CORS origins, Gemini model, credentials and model paths all come from environment variables (see `backend/.env.example`).

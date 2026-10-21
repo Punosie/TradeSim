@@ -2,62 +2,52 @@
 title: API
 ---
 
-This section outlines the key APIs used by the TradeSim frontend to interact with backend services for real-time data and trade simulation.
+This section outlines how the TradeSim frontend talks to the backend for real-time data, trade simulation and the AI assistant. See the [Backend API](../backend/api.md) for full request and response formats.
+
+The backend location comes from two build-time variables:
+
+| Variable       | Example                              |
+|----------------|--------------------------------------|
+| `VITE_API_URL` | `https://tradesim-alce.onrender.com` |
+| `VITE_WS_URL`  | `wss://tradesim-alce.onrender.com`   |
 
 ## WebSocket API
 
-TradeSim uses WebSocket connections to receive continuous streams of live data.
+| Purpose            | Endpoint         | Used by          |
+|--------------------|------------------|------------------|
+| Orderbook Data     | `/ws/okx`        | `OrderBook.jsx`  |
+| Prediction Metrics | `/ws/prediction` | `Prediction.jsx` |
 
-| Purpose             | Endpoint          | Description                                |
-|---------------------|-------------------|--------------------------------------------|
-| Prediction Metrics  | `/ws/prediction`  | Streams midpoint price predictions and related metrics in real-time. |
-| Orderbook Data      | `/ws/okx`         | Streams live orderbook updates from the OKX exchange for the `BTC-USDT_SWAP` asset. |
+Both use the shared `useWebSocket` hook (`src/hooks/useWebSocket.js`), which:
 
-### WebSocket Data Format
+- opens the socket when the component mounts and **always closes it on unmount**,
+- reconnects with exponential backoff (1s → 15s) if the connection drops,
+- parses each message as JSON and passes it to the component's handler.
 
-- Messages are JSON objects with fields specific to prediction metrics or orderbook snapshots.
-- Clients maintain persistent connections and handle updates to keep the UI in sync with live market data.
+The order book renders at most once per animation frame, however fast the feed ticks.
 
 ## REST API
 
-TradeSim uses REST endpoints to execute trades and retrieve data.
-
-| Purpose          | Endpoint           | Method | Description                 |
-|------------------|--------------------|--------|-----------------------------|
-| Simulate a Trade | `/simulate/trade`  | POST   | Sends a trade simulation request with order parameters and returns execution results. |
+| Purpose          | Endpoint          | Method | Used by           |
+|------------------|-------------------|--------|-------------------|
+| Simulate a trade | `/simulate/trade` | POST   | `TradeForm.jsx`   |
+| Trade history    | `/trade-history`  | GET    | `TradeOutput.jsx` |
+| Ask AI           | `/ask-ai`         | POST   | `InputForm.jsx`   |
 
 ### Simulate Trade Request
 
 ```json
 {
-  "asset": "BTC-USDT_SWAP",
   "exchange": "OKX",
-  "orderType": "market",
-  "quantityUSD": 1000
-}
-```
-
-### Response
-
-``` json
-{
-    "timestamp": "2025-05-30T22:46:25Z",
-    "exchange": "OKX",
-    "asset": "BTC-USDT-SWAP",
-    "order_type": "market",
-    "qty_usd": 1000.0,
-    "filled_qty": 0.00960489,
-    "fee_usd": 1.0,
-    "slippage": 0.0,
-    "average_price": 104009.5,
-    "total_spent": 1000.0,
-    "latency": "0.16ms",
-    "status": "success"
+  "asset": "BTC-USDT-SWAP",
+  "order_type": "market",
+  "qty_usd": 1000,
+  "side": "buy"
 }
 ```
 
 ## Integration Notes
 
-- WebSocket connections are managed via `react-use-websocket` for clean lifecycle management.
-- REST calls made using `axios` inside React components.
-- Proper error handling and reconnection strategies are followed.
+- All REST calls go through the shared axios client in `src/lib/api.js`. It attaches the signed-in user's Firebase ID token as `Authorization: Bearer <token>`.
+- API errors are shown to the user using the backend's `detail` message (for example, "Order book not available yet").
+- Routes are lazy-loaded, so AG Grid only loads on `/sim`, and the markdown/KaTeX renderer only loads on `/ask-ai`.
