@@ -25,7 +25,19 @@ MONGO_COLLECTION = os.getenv("MONGO_COLLECTION", "trades")
 
 # Gemini (GOOGLE_API_kEY kept for backwards compatibility with old .env files)
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY") or os.getenv("GOOGLE_API_kEY")
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
+# Models tried in order; a model that is overloaded falls through to the next.
+# GEMINI_MODEL (single model, older setting) is still honoured as the first choice.
+_DEFAULT_MODELS = "gemini-3.8-flash,gemini-3.5-flash,gemini-3.5-flash-lite"
+GEMINI_MODELS = list(dict.fromkeys(
+    m.strip()
+    for m in [os.getenv("GEMINI_MODEL", ""), *os.getenv("GEMINI_MODELS", _DEFAULT_MODELS).split(",")]
+    if m.strip()
+))
+# Per-model time limit before failing over; the last model in the chain gets longer
+GEMINI_ATTEMPT_TIMEOUT_S = float(os.getenv("GEMINI_ATTEMPT_TIMEOUT_S", "8"))
+GEMINI_LAST_TIMEOUT_S = float(os.getenv("GEMINI_LAST_TIMEOUT_S", "30"))
+# How long to skip a model after it reports it is overloaded
+GEMINI_COOLDOWN_S = float(os.getenv("GEMINI_COOLDOWN_S", "60"))
 
 # Firebase Admin credentials (Render mounts secret files under /etc/secrets)
 FIREBASE_CREDENTIALS_PATH = os.getenv("FIREBASE_CREDENTIALS_PATH") or (

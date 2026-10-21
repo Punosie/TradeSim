@@ -42,7 +42,7 @@ class TradeOutput(BaseModel):
 
 class PromptInput(BaseModel):
     """
-    Schema for prompt input data. The model is chosen server-side (GEMINI_MODEL);
+    Schema for prompt input data. The model is chosen server-side (GEMINI_MODELS);
     `model` is accepted for backwards compatibility and ignored.
     """
     model: str | None = Field(None, description="Ignored; the server picks the model")
