@@ -1,10 +1,12 @@
 import asyncio
 import logging
+import time
 from contextlib import contextmanager
 from typing import Literal
 
 import orjson
 
+from app.config import FEED_STATS_INTERVAL_S
 from app.okx_client import OKXClient
 from app.services.prediction_model import MidPriceModel
 
@@ -31,14 +33,32 @@ class OrderbookHub:
             "orderbook": set(),
             "prediction": set(),
         }
+        # Counters for the periodic feed summary
+        self._ticks = 0
+        self._dropped = 0
+        self._predict_ms = 0.0
+        self._predictions = 0
 
     async def run(self, client: OKXClient):
-        """Consume the upstream feed forever, reconnecting with backoff."""
+        """Consume the upstream feed forever, logging a periodic summary."""
+        stats_task = (
+            asyncio.create_task(self._log_stats(FEED_STATS_INTERVAL_S))
+            if FEED_STATS_INTERVAL_S > 0 else None
+        )
+        try:
+            await self._consume(client)
+        finally:
+            if stats_task:
+                stats_task.cancel()
+
+    async def _consume(self, client: OKXClient):
+        """Read the upstream feed, reconnecting with exponential backoff."""
         backoff = 1
         while True:
             try:
                 async for message in client.subscribe():
                     backoff = 1
+                    self._ticks += 1
                     self._on_message(message)
             except asyncio.CancelledError:
                 raise
@@ -46,6 +66,22 @@ class OrderbookHub:
                 logger.warning("Upstream feed error: %s; retrying in %ss", e, backoff)
             await asyncio.sleep(backoff)
             backoff = min(backoff * 2, self.MAX_BACKOFF)
+
+    async def _log_stats(self, interval: float):
+        """Periodic feed summary instead of one log line per tick."""
+        while True:
+            await asyncio.sleep(interval)
+            ticks, self._ticks = self._ticks, 0
+            dropped, self._dropped = self._dropped, 0
+            logger.info(
+                "Feed: %.1f ticks/s, clients orderbook=%d prediction=%d, dropped=%d, prediction %.2fms avg",
+                ticks / interval,
+                len(self._subscribers["orderbook"]),
+                len(self._subscribers["prediction"]),
+                dropped,
+                (self._predict_ms / self._predictions) if self._predictions else 0,
+            )
+            self._predict_ms, self._predictions = 0.0, 0
 
     def _on_message(self, message: dict):
         bids, asks = message.get("bids"), message.get("asks")
@@ -57,17 +93,21 @@ class OrderbookHub:
             self._publish("orderbook", orjson.dumps(message).decode())
 
         if self.model and self._subscribers["prediction"]:
+            start = time.perf_counter()
             try:
                 prediction = self.model.predict(bids, asks)
             except Exception:
                 logger.exception("Prediction failed")
                 return
+            self._predict_ms += (time.perf_counter() - start) * 1000
+            self._predictions += 1
             self._publish("prediction", orjson.dumps({"prediction": prediction}).decode())
 
     def _publish(self, channel: Channel, payload: str):
         for queue in self._subscribers[channel]:
             if queue.full():
                 queue.get_nowait()
+                self._dropped += 1
             queue.put_nowait(payload)
 
     @contextmanager

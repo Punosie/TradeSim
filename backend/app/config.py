@@ -15,6 +15,8 @@ PORT = int(os.getenv("PORT", 8000))
 
 # Upstream order book feed
 WS_ENDPOINT = os.getenv("WS_ENDPOINT", "")
+# Reconnect when the feed sends nothing for this long (it ticks ~10x/second)
+FEED_STALE_S = float(os.getenv("FEED_STALE_S", "10"))
 
 # MongoDB
 MONGO_URL = os.getenv("MONGO_URL", "")
@@ -52,3 +54,18 @@ CORS_ORIGIN_REGEX = os.getenv(
 )
 
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
+
+
+def _flag(name: str, default: str) -> bool:
+    return os.getenv(name, default).strip().lower() in ("1", "true", "yes", "on")
+
+
+# Request logging: incoming HTTP/WebSocket, and outgoing calls (Mongo, Gemini, HTTP)
+LOG_REQUESTS = _flag("LOG_REQUESTS", "true")
+LOG_OUTGOING = _flag("LOG_OUTGOING", "true")
+# Render polls /health every few seconds; keep those out of the logs by default
+LOG_HEALTH_CHECKS = _flag("LOG_HEALTH_CHECKS", "false")
+# Requests slower than this are logged at WARNING
+SLOW_REQUEST_MS = float(os.getenv("SLOW_REQUEST_MS", "1000"))
+# Interval for upstream feed throughput summaries (0 disables)
+FEED_STATS_INTERVAL_S = float(os.getenv("FEED_STATS_INTERVAL_S", "60"))

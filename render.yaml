@@ -12,7 +12,7 @@ services:
     autoDeploy: true
     buildCommand: pip install -r requirements.txt
     # Single worker: the order book hub is in-process state shared by all clients
-    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --proxy-headers --forwarded-allow-ips='*'
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --proxy-headers --forwarded-allow-ips='*' --no-access-log
     healthCheckPath: /health
     envVars:
       - key: PYTHON_VERSION

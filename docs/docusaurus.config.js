@@ -30,6 +30,8 @@ const config = {
     locales: ['en'],
   },
 
+  plugins: [require.resolve('./plugins/request-logger.js')],
+
   presets: [
     [
       'classic',

@@ -8,15 +8,19 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 
-from app.config import CORS_ORIGIN_REGEX, CORS_ORIGINS, LOG_LEVEL, MODEL_PATH
-from app.db import client as mongo_client, trade_repository
-from app.okx_client import OKXClient
-from app.router.routes import router as app_router
-from app.services.orderbook_manager import hub
-from app.services.prediction_model import MidPriceModel
-from app.utils.firebase_auth import init_firebase
+from app.config import CORS_ORIGIN_REGEX, CORS_ORIGINS, LOG_REQUESTS, MODEL_PATH
+from app.logging_setup import setup_logging
 
-logging.basicConfig(level=LOG_LEVEL, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+setup_logging()
+
+from app.db import client as mongo_client, trade_repository  # noqa: E402
+from app.middleware.request_logging import RequestLoggingMiddleware  # noqa: E402
+from app.okx_client import OKXClient  # noqa: E402
+from app.router.routes import router as app_router  # noqa: E402
+from app.services.orderbook_manager import hub  # noqa: E402
+from app.services.prediction_model import MidPriceModel  # noqa: E402
+from app.utils.firebase_auth import init_firebase  # noqa: E402
+
 logger = logging.getLogger("tradesim")
 
 
@@ -51,7 +55,13 @@ app.add_middleware(
     allow_origin_regex=CORS_ORIGIN_REGEX or None,
     allow_credentials=True,
     allow_methods=["GET", "POST", "OPTIONS"],
-    allow_headers=["Authorization", "Content-Type"],
+    allow_headers=["Authorization", "Content-Type", "X-Request-ID"],
+    expose_headers=["X-Request-ID", "Server-Timing"],
+    # Let browsers cache the preflight for 10 minutes instead of re-sending it
+    max_age=600,
 )
+# Added last so it wraps everything, including CORS preflights
+if LOG_REQUESTS:
+    app.add_middleware(RequestLoggingMiddleware)
 
 app.include_router(app_router)

@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { log } from "../lib/logger";
 
 const MAX_BACKOFF_MS = 15000;
 
@@ -22,20 +23,35 @@ const useWebSocket = (url, onMessage) => {
         let closed = false;
 
         const connect = () => {
+            const start = performance.now();
+            let opened = start;
+            let received = 0;
+            log.ws(`→ connect ${url}`);
             socket = new WebSocket(url);
             socket.onopen = () => {
                 attempt = 0;
+                opened = performance.now();
+                log.ws(`✓ open ${url} in ${(opened - start).toFixed(0)}ms`);
             };
             socket.onmessage = (event) => {
+                received++;
+                if (received === 1) {
+                    log.ws(`first message ${url} ${(performance.now() - start).toFixed(0)}ms after connect`);
+                }
                 try {
                     handlerRef.current(JSON.parse(event.data));
                 } catch (err) {
-                    console.warn("Error parsing message:", err);
+                    log.wsError("Error parsing message:", err);
                 }
             };
-            socket.onclose = () => {
+            socket.onerror = () => log.wsError(`error ${url}`);
+            socket.onclose = (event) => {
+                log.ws(
+                    `✗ close ${url} code=${event.code} after ${((performance.now() - opened) / 1000).toFixed(1)}s, ${received} messages`
+                );
                 if (closed) return;
                 const delay = Math.min(1000 * 2 ** attempt++, MAX_BACKOFF_MS);
+                log.wsError(`reconnecting ${url} in ${delay}ms (attempt ${attempt})`);
                 retryTimer = setTimeout(connect, delay);
             };
         };

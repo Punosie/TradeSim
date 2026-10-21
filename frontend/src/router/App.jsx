@@ -1,6 +1,17 @@
-import { lazy, Suspense } from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router'
+import { lazy, Suspense, useEffect } from 'react'
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router'
 import Home from '../pages/Home'
+import { log } from '../lib/logger'
+
+const RouteLogger = () => {
+  const { pathname } = useLocation()
+  useEffect(() => {
+    const start = performance.now()
+    // Next frame after the route commits ≈ when the new page is on screen
+    requestAnimationFrame(() => log.route(`${pathname} rendered in ${(performance.now() - start).toFixed(0)}ms`))
+  }, [pathname])
+  return null
+}
 
 // Home is the landing page and stays in the main bundle; the rest load on demand
 const About = lazy(() => import('../pages/About'))
@@ -18,6 +29,7 @@ const PageFallback = () => (
 const App = () => {
   return (
     <Router>
+      <RouteLogger />
       <Suspense fallback={<PageFallback />}>
         <Routes>
           <Route path="/" element={<Home />} />

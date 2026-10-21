@@ -25,3 +25,11 @@ build/
 
 # Firebase Admin credentials
 firebase-adminsdk.json
+
+# graphify knowledge graph (rebuilt locally by the post-commit hook)
+graphify-out/
+
+# Playwright
+playwright-report/
+test-results/
+blob-report/
